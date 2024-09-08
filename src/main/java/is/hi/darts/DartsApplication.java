@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DartsApplication {
 
     //"Bulldarts" - Ari
+    //this is team member Sölvi Santos
     public static void main(String[] args) {
         SpringApplication.run(DartsApplication.class, args);
     }
