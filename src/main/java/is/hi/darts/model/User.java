@@ -1,4 +1,4 @@
-package is.hi.darts;
+package is.hi.darts.model;
 
 public class User {
     private Long id;
