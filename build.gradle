@@ -27,6 +27,7 @@ dependencies {
     // Spring Data JPA for database interaction
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'com.h2database:h2'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.2.RELEASE'
 
     // Spring Security starter for security-related functionality like authentication
     implementation 'org.springframework.boot:spring-boot-starter-security'

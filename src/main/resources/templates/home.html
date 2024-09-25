@@ -1,28 +1,69 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <title>Dart Score Tracking - Home</title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
 <body>
 
-<header>
-    <h1>Dart Score Tracking</h1>
-</header>
+<div class="wrapper">
 
-<main>
-    <h2 th:text="${message}">Welcome to the Dart Score Tracking Website!</h2>
-    <p>Track your scores, manage players, and improve your game with our easy-to-use tool.</p>
+    <header>
+        <div class="header-left">
+            <h1><a th:href="@{/}">Dart Score Tracking</a></h1>
+        </div>
+        <div class="header-right">
+            <nav>
+                <ul>
+                    <li sec:authorize="!isAuthenticated()"><a th:href="@{/login}" class="button">Login</a></li>
+                    <li sec:authorize="!isAuthenticated()"><a th:href="@{/register}" class="button">Register</a></li>
 
-    <div class="cta">
-        <a th:href="@{/login}" class="button">Login</a>
-        <a th:href="@{/register}" class="button">Register</a>
-    </div>
-</main>
+                    <li sec:authorize="isAuthenticated()">
+                        <form th:action="@{/logout}" method="post" style="display: inline;">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit" class="button">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-<footer>
-    <p>&copy; 2024 Dart Score Tracker</p>
-</footer>
+    <!-- Main content area -->
+    <main>
+        <section class="welcome-section">
+            <h2 th:text="${message}">Welcome to the Dart Score Tracking Website!</h2>
+            <p>Track your scores, manage players, and improve your game with our easy-to-use tool. Join our community
+                to make the most of your dart playing experience.</p>
+        </section>
+
+        <section class="player-info" sec:authorize="isAuthenticated()">
+            <h3>Player Information</h3>
+            <p>Welcome back, <span sec:authentication="name"></span>!</p>
+
+            <ul class="player-stats">
+                <li><strong>Total games played:</strong> 15</li>
+                <li><strong>Best score:</strong> 180</li>
+                <li><strong>Average score:</strong> 95</li>
+            </ul>
+        </section>
+
+        <section class="promo-section" sec:authorize="!isAuthenticated()">
+            <h3>Why Join Us?</h3>
+            <ul>
+                <li>Track your scores and progress over time.</li>
+                <li>Compete with friends and other players.</li>
+                <li>Get insights into your performance and improve your game!</li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Dart Score Tracker</p>
+    </footer>
+
+</div>
 
 </body>
 </html>

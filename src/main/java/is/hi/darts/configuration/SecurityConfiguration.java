@@ -8,9 +8,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
 public class SecurityConfiguration {
@@ -34,7 +31,13 @@ public class SecurityConfiguration {
                         .defaultSuccessUrl("/", true)  // Redirect after successful login
                         .permitAll()
                 )
-                .logout(LogoutConfigurer::permitAll  // Allow everyone to logout
+                .logout(logout -> logout
+                        .logoutUrl("/logout")  // Custom logout URL
+                        .logoutSuccessUrl("/")  // Redirect after logout
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")  // Clear session cookies
+                        .permitAll()
                 );
 
         return http.build();
