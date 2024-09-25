@@ -2,6 +2,10 @@ package is.hi.darts.service;
 
 
 import is.hi.darts.model.User;
+import is.hi.darts.repository.UserRepository;
+import is.hi.darts.configuration.SecurityConfiguration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 
 public class UserService {
 
