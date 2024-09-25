@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dart Score Tracking - Home</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+
+<header>
+    <h1>Dart Score Tracking</h1>
+</header>
+
+<main>
+    <h2 th:text="${message}">Welcome to the Dart Score Tracking Website!</h2>
+    <p>Track your scores, manage players, and improve your game with our easy-to-use tool.</p>
+
+    <div class="cta">
+        <a th:href="@{/login}" class="button">Login</a>
+        <a th:href="@{/register}" class="button">Register</a>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2024 Dart Score Tracker</p>
+</footer>
+
+</body>
+</html>

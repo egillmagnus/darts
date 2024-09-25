@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email")})
 public class User {
 
     @Id  // Primary key
@@ -18,7 +18,7 @@ public class User {
     @Column(nullable = false)  // Password is required
     private String password;
 
-    @Column(nullable = false, unique = true)  // Username must be unique
+    @Column(nullable = false)  // Username is required but not unique
     private String username;
 
     @ElementCollection
