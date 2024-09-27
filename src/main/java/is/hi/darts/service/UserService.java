@@ -5,7 +5,6 @@ import is.hi.darts.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,24 +19,18 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Register new user
-    public User registerUser(String email, String username, String password) {
+    // Register new user using constructor
+    public User registerUser(String email, String displayName, String password) {
         if (userRepository.existsByEmail(email)) {
-            System.out.println("User already exists");
             throw new RuntimeException("Email is already registered.");
         }
-        System.out.println("Registering User with info:");
-        System.out.println(email);
-        System.out.println(username);
-        System.out.println(password);
-        User user = new User();
-        user.setEmail(email);
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password)); // Hash the password
+
+        // Create User using the constructor and hashed password
+        User user = new User(null, email, passwordEncoder.encode(password), displayName);
         return userRepository.save(user);
     }
 
-    // Log in user
+    // Log in user (Custom login logic)
     public User loginUser(String email, String password) {
         User user = userRepository.findByEmail(email);
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
@@ -46,20 +39,13 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-
+    // Load user by email (used for authentication)
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
         if (user == null) {
-                throw new UsernameNotFoundException("User not found with email: " + email);
+            throw new UsernameNotFoundException("User not found with email: " + email);
         }
-
-        // Build UserDetails with user information
-        UserBuilder builder = org.springframework.security.core.userdetails.User.withUsername(user.getUsername());
-        builder.password(user.getPassword());
-        builder.roles("USER");
-
-        return builder.build();
+        return user;
     }
-
 }
