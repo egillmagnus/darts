@@ -1,12 +1,19 @@
 package is.hi.darts.model;
 
-public class Round {
-    private int roundNumber;
-    private int score;
+import jakarta.persistence.Embeddable;
 
-    public Round(int roundNumber, int score){
+@Embeddable
+public class Round {
+
+    private int roundNumber;
+    private int playerScore;
+
+    public Round() {
+    }
+
+    public Round(int roundNumber, int playerScore) {
         this.roundNumber = roundNumber;
-        this.score = score;
+        this.playerScore = playerScore;
     }
 
     public int getRoundNumber() {
@@ -17,11 +24,11 @@ public class Round {
         this.roundNumber = roundNumber;
     }
 
-    public int getScore() {
-        return score;
+    public int getPlayerScore() {
+        return playerScore;
     }
 
-    public void setScore(int score) {
-        this.score = score;
+    public void setPlayerScore(int playerScore) {
+        this.playerScore = playerScore;
     }
 }
