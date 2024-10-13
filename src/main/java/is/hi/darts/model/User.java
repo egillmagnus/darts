@@ -39,7 +39,6 @@ public class User implements UserDetails {
         this.username = username;
     }
 
-    // Getters and Setters for id, email, password, and username
     public Long getId() {
         return id;
     }

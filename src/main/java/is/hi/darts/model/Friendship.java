@@ -18,16 +18,13 @@ public class Friendship {
     @JoinColumn(name = "user2_id", nullable = false)
     private User user2;
 
-    // Default constructor
     public Friendship() {}
 
-    // Constructor with parameters
     public Friendship(User user1, User user2) {
         this.user1 = user1;
         this.user2 = user2;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

@@ -16,7 +16,6 @@ public class Game {
     @ElementCollection
     private List<Player> players;
 
-    // Store rounds separately
     @ElementCollection
     @CollectionTable(name = "game_rounds", joinColumns = @JoinColumn(name = "game_id"))
     private List<Round> rounds;
@@ -40,11 +39,9 @@ public class Game {
     @Column(name = "status", nullable = false)
     private GameStatus status;
 
-    // Store current player as an index instead of the Player object
     @Column(name = "current_player_index")
     private int currentPlayerIndex;
 
-    // Constructors, Getters, and Setters
 
     public Game() {
     }

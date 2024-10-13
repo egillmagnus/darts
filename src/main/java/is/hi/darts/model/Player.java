@@ -13,8 +13,8 @@ public class Player {
     }
 
     public Player(User user) {
-        this.id = user.getId(); // Assuming User has an ID field
-        this.score = 0; // Initial score is set to 0
+        this.id = user.getId();
+        this.score = 0;
     }
 
     public Player(Long id, int score, List<Round> rounds) {

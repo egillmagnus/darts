@@ -14,7 +14,6 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Replace formLogin() with a custom endpoint for login handling
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/register", "/css/**").permitAll()
                         .anyRequest().authenticated()

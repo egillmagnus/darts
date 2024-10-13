@@ -33,7 +33,7 @@ public class AuthenticationController {
     public String loginUser(
             @RequestParam String email,
             @RequestParam String password,
-            HttpServletRequest request, // Get the request to manage session
+            HttpServletRequest request,
             Model model) {
         try {
             User user = userService.loginUser(email, password);
@@ -42,10 +42,8 @@ public class AuthenticationController {
                     new UsernamePasswordAuthenticationToken(
                             user, null, user.getAuthorities());
 
-            // Set authentication in the security context
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-            // Create a new session and add the authentication to it
             HttpSession session = request.getSession(true);
             session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
 

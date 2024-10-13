@@ -63,7 +63,6 @@ public class UserServiceImplementation implements UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         User friend = userRepository.findById(friendId).orElseThrow(() -> new RuntimeException("Friend not found"));
 
-        // Check if friend request already exists
         if (!friendRequestRepository.existsByRequesterAndRequestedUser(user, friend)) {
             FriendRequest friendRequest = new FriendRequest(user, friend);
             friendRequestRepository.save(friendRequest);
