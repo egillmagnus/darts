@@ -1,10 +1,38 @@
 <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMES Darts</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
-<body>
 
+<body>
+<!-- Main Container for the layout -->
+<div class="main-container">
+    <!-- Header with title on the left and a button for opening the menu -->
+    <div class="header-text">
+        <h1>AMES <span>darts</span></h1>
+    </div>
+
+    <!-- Sidebar navigation -->
+    <div class="side-container">
+        <nav>
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="#playLocal">Play Local</a></li>
+                <li><a href="#playOnline">Play Online</a></li>
+                <li><a href="profile.html">Profile</a></li>
+                <li><a href="friends.html">Friends</a></li>
+                <li><a href="statistics.html">Statistics</a></li>
+                <li><a href="settings.html">Settings</a></li>
+                <li><a href="logout.html">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
 </body>
+
+
 </html>
