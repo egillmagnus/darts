@@ -6,6 +6,8 @@ import is.hi.darts.service.GameService;
 import is.hi.darts.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,10 +23,20 @@ public class GameController {
     private UserService userService;
 
     // Add a Friend
-    @PostMapping("/friends/{userId}/add")
-    public ResponseEntity<String> addFriend(@PathVariable Long userId, @RequestParam Long friendId) {
+    @PostMapping("/friends/add")
+    public ResponseEntity<String> addFriend(@RequestParam String identifier) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User currentUser = userService.getByEmail(userDetails.getUsername());
+
         try {
-            userService.addFriend(userId, friendId);
+            User friend;
+            if (identifier.matches("\\d+")) {
+                friend = userService.getById(Long.parseLong(identifier));
+            } else {
+                friend = userService.getByEmail(identifier);
+            }
+
+            userService.addFriend(currentUser.getId(), friend.getId());
             return ResponseEntity.ok("Friend request sent.");
         } catch (Exception e) {
             return ResponseEntity.status(400).body("Failed to add friend: " + e.getMessage());

@@ -15,6 +15,8 @@ public interface UserService extends UserDetailsService {
 
     User getByEmail(String email);
 
+    User getById(Long id);
+
     // Friend management methods
     void addFriend(Long userId, Long friendId);  // Add a friend by their user ID
     List<User> getFriendsList(Long userId);      // Retrieve the friends list for the user

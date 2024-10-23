@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<head>
+    <title>Add Friend</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>Add a Friend</h1>
+
+<form id="addFriendForm" th:action="@{/friends/add}" method="post">
+    <label for="identifier">Enter User ID or Email:</label>
+    <input type="text" id="identifier" name="identifier" placeholder="User ID or Email" required>
+
+    <button type="submit">Send Friend Request</button>
+</form>
+
+<script>
+    $('#addFriendForm').submit(function(event) {
+        event.preventDefault();
+
+        var identifier = $('#identifier').val();
+
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+
+        $.ajax({
+            url: '/friends/add',
+            type: 'POST',
+            data: {identifier: identifier},
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token);
+            },
+            success: function(response) {
+                alert("Friend request sent successfully.");
+                $('#identifier').val('');
+            },
+            error: function(xhr, status, error) {
+                alert("Error: " + xhr.responseText);
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

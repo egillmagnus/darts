@@ -2,12 +2,12 @@ package is.hi.darts.controller;
 
 import is.hi.darts.model.FriendRequest;
 import is.hi.darts.model.User;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import is.hi.darts.service.*;
 
@@ -30,14 +30,11 @@ public class NavigationController {
 
     @GetMapping("/profile")
     public String profile(Model model) {
-        // Get the logged-in user
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        // Assuming you have a method in your UserService to get the user by email or username
-        User user = userService.getByEmail(userDetails.getUsername()); // or userDetails.getUsername(
+        User user = userService.getByEmail(userDetails.getUsername());
 
         Long userId = user.getId();
-        // Fetch incoming, outgoing friend requests, and friends list
         List<FriendRequest> incomingRequests = userService.getIncomingRequests(userId);
         model.addAttribute("incomingRequests", incomingRequests);
 
@@ -47,7 +44,67 @@ public class NavigationController {
         List<User> friendsList = userService.getFriendsList(userId);
         model.addAttribute("friendsList", friendsList);
 
-        return "profile"; // Return the Thymeleaf template
+        return "profile";
+    }
+
+    @GetMapping("/addFriend")
+    public String addFriendPage() {
+        return "addFriend";
+    }
+
+    @PostMapping("/friends/add")
+    public ResponseEntity<String> addFriend(@RequestParam String identifier) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User currentUser = userService.getByEmail(userDetails.getUsername());
+
+        try {
+            User friend;
+            if (identifier.matches("\\d+")) {
+                friend = userService.getById(Long.parseLong(identifier));
+            } else {
+                friend = userService.getByEmail(identifier);
+            }
+
+            userService.addFriend(currentUser.getId(), friend.getId());
+            return ResponseEntity.ok("Friend request sent.");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Failed to add friend: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/friends")
+    public ResponseEntity<List<User>> getFriendsList(@RequestParam Long userId) {
+        try {
+            List<User> friendsList = userService.getFriendsList(userId);
+            return ResponseEntity.ok(friendsList);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(null);
+        }
+    }
+
+    @PostMapping("/friends/requests/respond")
+    public ResponseEntity<String> respondToFriendRequest(@RequestParam Long requestId, @RequestParam boolean response) {
+        try {
+            userService.respondToFriendRequest(requestId, response);
+            return ResponseEntity.ok("Friend request " + (response ? "accepted" : "rejected"));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Failed to respond to friend request: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/friends/{friendId}/remove")
+    public ResponseEntity<String> removeFriend(@PathVariable Long friendId ) {
+        try {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            User user = userService.getByEmail(userDetails.getUsername());
+
+            Long userId = user.getId();
+            userService.removeFriend(userId, friendId);
+            return ResponseEntity.ok("Friend removed successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Failed to remove friend: " + e.getMessage());
+        }
     }
 
 }

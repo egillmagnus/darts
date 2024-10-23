@@ -5,6 +5,8 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <body>
 <h1>User Profile</h1>
 
@@ -17,16 +19,13 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="request : ${incomingRequests}">
+    <tr th:each="request : ${incomingRequests}" th:id="${'request-' + request.id}">
         <td th:text="${request.requester.username}">Requester Username</td>
         <td>
-            <!-- Accept/Reject buttons -->
-            <form th:action="@{/friends/accept/{id}(id=${request.id})}" method="post">
-                <button type="submit">✔</button>
-            </form>
-            <form th:action="@{/friends/reject/{id}(id=${request.id})}" method="post">
-                <button type="submit">✖</button>
-            </form>
+            <!-- Accept/Reject buttons with AJAX -->
+            <button th:onclick="'respondToFriendRequest(' + ${request.id} + ', true, \'request-' + ${request.id} + '\')'">✔</button>
+            <button th:onclick="'respondToFriendRequest(' + ${request.id} + ', false, \'request-' + ${request.id} + '\')'">✖</button>
+
         </td>
     </tr>
     </tbody>
@@ -53,16 +52,59 @@
     <thead>
     <tr>
         <th>Username</th>
-        <th>Email</th>
+        <th>Action</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="friend : ${friendsList}">
+    <tr th:each="friend : ${friendsList}" th:id="${'friend-' + friend.id}">
         <td th:text="${friend.username}">Friend Username</td>
-        <td th:text="${friend.email}">Friend Email</td>
+        <td>
+            <!-- Remove Friend Button -->
+            <button th:onclick="'removeFriend(' + ${friend.id} + ', \'friend-' + ${friend.id} + '\')'">Remove</button>
+        </td>
     </tr>
     </tbody>
 </table>
+
+<script type="text/javascript">
+    console.log("Script loaded and ready");
+
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+
+    function respondToFriendRequest(requestId, response, rowId) {
+        $.ajax({
+            url: '/friends/requests/respond',
+            type: 'POST',
+            data: { requestId: requestId, response: response },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token);
+            },
+            success: function() {
+                $('#' + rowId).remove();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error processing request: " + error);
+            }
+        });
+    }
+
+    function removeFriend(friendId, rowId) {
+        $.ajax({
+            url: '/friends/' + friendId + '/remove',
+            type: 'DELETE',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token);
+            },
+            success: function() {
+                $('#' + rowId).remove();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error removing friend: " + error);
+            }
+        });
+    }
+</script>
 
 </body>
 </html>

@@ -78,6 +78,12 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    public User getById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+    }
+
+    @Override
     public void respondToFriendRequest(Long requestId, boolean accept) {
         FriendRequest request = friendRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Friend request not found"));
