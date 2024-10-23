@@ -98,4 +98,19 @@ public class UserServiceImplementation implements UserService {
                 .orElseThrow(() -> new RuntimeException("Friendship not found"));
         friendshipRepository.delete(friendship);
     }
+
+    @Override
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public List<FriendRequest> getIncomingRequests(Long userId) {
+        return friendRequestRepository.findByRequestedUser_Id(userId);
+    }
+
+    @Override
+    public List<FriendRequest> getOutgoingRequests(Long userId) {
+        return friendRequestRepository.findByRequester_Id(userId);
+    }
 }

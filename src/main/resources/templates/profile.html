@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Profile</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>User Profile</h1>
+
+<h2>Incoming Friend Requests</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Requester</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="request : ${incomingRequests}">
+        <td th:text="${request.requester.username}">Requester Username</td>
+        <td>
+            <!-- Accept/Reject buttons -->
+            <form th:action="@{/friends/accept/{id}(id=${request.id})}" method="post">
+                <button type="submit">✔</button>
+            </form>
+            <form th:action="@{/friends/reject/{id}(id=${request.id})}" method="post">
+                <button type="submit">✖</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Outgoing Friend Requests</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Requested User</th>
+        <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="request : ${outgoingRequests}">
+        <td th:text="${request.requestedUser.username}">Requested Username</td>
+        <td>Pending</td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Your Friends</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Username</th>
+        <th>Email</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="friend : ${friendsList}">
+        <td th:text="${friend.username}">Friend Username</td>
+        <td th:text="${friend.email}">Friend Email</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
