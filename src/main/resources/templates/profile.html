@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>User Profile</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <meta name="_csrf" th:content="${_csrf.token}"/>
 <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <body>
+<div class="profile-container">
 <h1>User Profile</h1>
-
 <h2>Incoming Friend Requests</h2>
 <table>
     <thead>
@@ -65,7 +66,7 @@
     </tr>
     </tbody>
 </table>
-
+</div>
 <script type="text/javascript">
     console.log("Script loaded and ready");
 
@@ -74,7 +75,7 @@
 
     function respondToFriendRequest(requestId, response, rowId) {
         $.ajax({
-            url: '/friends/requests/respond',
+            url: '/player/friends/requests/respond',
             type: 'POST',
             data: { requestId: requestId, response: response },
             beforeSend: function(xhr) {
@@ -91,7 +92,7 @@
 
     function removeFriend(friendId, rowId) {
         $.ajax({
-            url: '/friends/' + friendId + '/remove',
+            url: '/player/friends/' + friendId + '/remove',
             type: 'DELETE',
             beforeSend: function(xhr) {
                 xhr.setRequestHeader(header, token);
