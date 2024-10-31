@@ -176,6 +176,7 @@ ul li {
 .header-text {
     flex-grow: 1;
     font-size: 30px;
+    max-width: fit-content;
 }
 
 .header-text h1 {
@@ -400,6 +401,15 @@ nav ul li a:hover::after {
     }
 }
 /*-----------------------add friend-------------------------- */
+.friend-main-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
 .add-friend-container {
     text-align: center;
     background-color: #333333; /* Darker background for the form */
@@ -413,4 +423,54 @@ nav ul li a:hover::after {
     font-size: 24px;
     color: #FF4500; /* Darts board red/orange color */
     margin-bottom: 15px;
+}
+
+/*------------game calc(slang for calculator)---------------------------*/
+
+
+ .game-container {
+     max-width: 800px;
+     margin: auto;
+     padding: 2rem;
+     text-align: center;
+ }
+
+.header h1 {
+    font-size: 2.5rem;
+    color: #282828;
+}
+
+.game-info, .players-section, .game-summary {
+    margin-top: 2rem;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.players-section {
+    display: flex;
+    justify-content: space-around;
+}
+
+.player {
+    flex: 1;
+    margin: 0 1rem;
+    padding: 1rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.player h3 {
+    font-size: 1.5rem;
+    color: #004d00;
+}
+
+.score-log {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.game-summary h2 {
+    font-size: 1.5rem;
+    color: #ff004f;
 }
