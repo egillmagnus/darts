@@ -48,4 +48,6 @@ public interface GameService {
 
     // Retrieve game participants
     List<User> getGameParticipants(Long gameId);
+    //
+    double calculateThreeDartAverage();
 }

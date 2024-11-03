@@ -73,15 +73,26 @@ public class PlayerController {
         }
     }
 
-    @GetMapping ("/addfriend")
-    public String addFriendPage(Model model){
+    @GetMapping("/addfriend")
+    public String addFriendPage(Model model) {
         return "addfriend";
     }
-    @GetMapping ("/game")
-    public String gamePage(Model model){
+
+    @GetMapping("/game")
+    public String gamePage(Model model) {
         return "game";
     }
 
 
+    @GetMapping("/users/{userId}/stats")
+    public ResponseEntity<Double> getUserThreeDartAverage(@PathVariable Long userId) {
+        try {
+            User user = userService.getById(userId);
+            double threeDartAverage = userService.calculateThreeDartAverage(user);
+            return ResponseEntity.ok(threeDartAverage);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(null);
+        }
+    }
 
 }

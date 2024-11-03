@@ -151,8 +151,18 @@ public class Game {
 
         currentPlayer.setScore(currentPlayer.getScore() + score);
 
+        Round newRound = new Round(currentRound, score, currentPlayer.getId());
+        rounds.add(newRound);
+
         currentRound++;
         nextPlayer();
+    }
+    // returns the total score by a player in a game
+    public int getTotalScoreForPlayer(Long playerId) {
+        return rounds.stream()
+                .filter(round -> round.getPlayerId().equals(playerId)) // Filter by playerId
+                .mapToInt(Round::getPlayerScore)
+                .sum();
     }
 
     // Logic to undo the last throw
@@ -163,9 +173,24 @@ public class Game {
 
         // Undo the score from the current player
         Player currentPlayer = getCurrentPlayer();
-        if (currentPlayer != null) {
-            int lastScore = rounds.get(currentRound - 1).getPlayerScore();
+
+        Round lastRoundForPlayer = null;
+        for (int i = rounds.size() - 1; i >= 0; i--) {
+            Round round = rounds.get(i);
+            if (round.getPlayerId().equals(currentPlayer.getId())) {
+                lastRoundForPlayer = round;
+                break;
+            }
+        }
+        if (lastRoundForPlayer != null) {
+            // Undo the score from the current player
+            int lastScore = lastRoundForPlayer.getPlayerScore();
             currentPlayer.setScore(currentPlayer.getScore() - lastScore);
+
+            // Remove the last round for this player from the rounds list
+            rounds.remove(lastRoundForPlayer);
+        } else {
+            throw new RuntimeException("No round to undo for the current player");
         }
 
         currentRound--;

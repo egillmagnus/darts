@@ -7,13 +7,15 @@ public class Round {
 
     private int roundNumber;
     private int playerScore;
+    private Long playerId;
 
     public Round() {
     }
 
-    public Round(int roundNumber, int playerScore) {
+    public Round(int roundNumber, int playerScore, Long playerId) {
         this.roundNumber = roundNumber;
         this.playerScore = playerScore;
+        this.playerId = playerId;
     }
 
     public int getRoundNumber() {
@@ -30,5 +32,12 @@ public class Round {
 
     public void setPlayerScore(int playerScore) {
         this.playerScore = playerScore;
+    }
+    public Long getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(Long playerId) {
+        this.playerId = playerId;
     }
 }

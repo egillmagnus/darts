@@ -24,6 +24,12 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String username;
 
+    @Column(nullable = false)
+    private double threeDartAverage;
+
+    @Column(nullable = false)
+    private Long totalRounds;
+
     @ElementCollection
     @CollectionTable(name = "user_previous_games", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "previous_game")
@@ -37,6 +43,8 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.username = username;
+        this.threeDartAverage = 0.0;
+        this.totalRounds = 0L;
     }
 
     public Long getId() {
@@ -67,6 +75,22 @@ public class User implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setThreeDartAverage(Double threeDartAverage){
+        this.threeDartAverage = threeDartAverage;
+    }
+
+    public double getThreeDartAverage(){
+        return threeDartAverage;
+    }
+
+    public Long getTotalRounds(){
+        return totalRounds;
+    }
+
+    public void setTotalRounds(Long totalRounds){
+        this.totalRounds = totalRounds;
     }
 
     public List<String> getPreviousGames() {
