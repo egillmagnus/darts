@@ -485,3 +485,53 @@ nav ul li a:hover::after {
         font-size: 1.5rem;
         color: #ff004f;
     }
+
+.player-box {
+    display: grid;
+    grid-template-areas:
+        "score score score"
+        "left middle right";
+    grid-template-columns: 1fr 2fr 1fr;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+}
+
+/* Green theme for Player 1 */
+.player-box.green {
+    background-color: #2e8b57; /* Dark green */
+    border: 2px solid #006400; /* Darker green border */
+}
+
+/* Red theme for Player 2 */
+.player-box.red {
+    background-color: #b22222; /* Firebrick red */
+    border: 2px solid #8b0000; /* Dark red border */
+}
+
+/* Styling for the score in the top row */
+.player-box .score {
+    grid-area: score;
+    font-size: 24px;
+    font-weight: bold;
+    align-self: center;
+    justify-self: center;
+}
+
+/* Left column for 3 Dart Average and First 9 Average */
+.player-box .left {
+    grid-area: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* Right column for Last Score and Darts Thrown */
+.player-box .right {
+    grid-area: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
