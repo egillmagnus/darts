@@ -28,6 +28,10 @@
         </div>
         <div class="tab-contents" id="gameplay">
             <!-- Repeatable Player Section -->
+            <div class="player" th:if="${#lists.isEmpty(players)}">
+                <p>No players found. Please add players to begin the game.</p>
+            </div>
+
             <div class="player" th:each="player : ${players}">
                 <h3 th:text="${player.name}">Player 1</h3>
                 <p>Score: <span th:text="${player.score}">0</span></p>
@@ -48,6 +52,7 @@
                 </div>
             </div>
         </div>
+
         <div class="tab-contents" id="summary">
             <h2>Game Summary</h2>
             <ul>

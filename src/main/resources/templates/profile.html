@@ -34,7 +34,11 @@
 
 <h2>Outgoing Friend Requests</h2>
 <table>
+
     <thead>
+    <div class="add-friend-button">
+    <a th:href="@{/player/addfriend}" class="button profile">add friend</a>
+    </div>
     <tr>
         <th>Requested User</th>
         <th>Status</th>
@@ -66,6 +70,7 @@
     </tr>
     </tbody>
 </table>
+
 </div>
 <script type="text/javascript">
     console.log("Script loaded and ready");

@@ -352,125 +352,136 @@ nav ul li a:hover::after {
     text-align: left;
 }
 
-.profile-table tbody td {
-    background-color: #282828; /* Dark background for table rows */
-    color: #ffffff; /* White text */
-    padding: 0.75em;
-    border-bottom: 1px solid #d3d3d3; /* Light gray border */
+.add-friend-button {
+    display: flex;
+    justify-content: flex-end; /* Moves the button to the right */
 }
 
-/* Button Styling */
-.profile-table button {
-    padding: 0.5em 1em;
-    background-color: #ff0000; /* Dartboard red */
-    border: none;
-    color: #ffffff; /* White text */
-    border-radius: 0.25rem;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.3s ease;
+.button.profile {
+    margin-left: auto;
 }
 
-.profile-table button:hover {
-    background-color: #cc0000; /* Darker red for hover */
-}
 
-/* Status Label Styling */
-.status-label {
-    font-weight: bold;
-    color: #d3d3d3; /* Light gray */
-}
 
-/* Responsive design for smaller screens */
-@media (max-width: 768px) {
-    .profile-container {
-        padding: 1em;
+    .profile-table tbody td {
+        background-color: #282828; /* Dark background for table rows */
+        color: #ffffff; /* White text */
+        padding: 0.75em;
+        border-bottom: 1px solid #d3d3d3; /* Light gray border */
     }
 
-    .profile-container h1 {
-        font-size: 1.5rem;
-    }
-
-    .profile-container h2 {
-        font-size: 1.2rem;
-    }
-
-    .profile-table thead th, .profile-table tbody td {
+    /* Button Styling */
+    .profile-table button {
+        padding: 0.5em 1em;
+        background-color: #ff0000; /* Dartboard red */
+        border: none;
+        color: #ffffff; /* White text */
+        border-radius: 0.25rem;
+        cursor: pointer;
         font-size: 0.9rem;
-        padding: 0.5em;
+        transition: background-color 0.3s ease;
     }
-}
-/*-----------------------add friend-------------------------- */
-.friend-main-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    height: 100vh;
-    justify-content: center;
-    align-items: center;
-}
 
-.add-friend-container {
-    text-align: center;
-    background-color: #333333; /* Darker background for the form */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px #FF4500; /* Orange glow for a darts theme */
-    width: 300px;
-}
+    .profile-table button:hover {
+        background-color: #cc0000; /* Darker red for hover */
+    }
 
-.add-friend-container h1 {
-    font-size: 24px;
-    color: #FF4500; /* Darts board red/orange color */
-    margin-bottom: 15px;
-}
+    /* Status Label Styling */
+    .status-label {
+        font-weight: bold;
+        color: #d3d3d3; /* Light gray */
+    }
 
-/*------------game calc(slang for calculator)---------------------------*/
+    /* Responsive design for smaller screens */
+    @media (max-width: 768px) {
+        .profile-container {
+            padding: 1em;
+        }
+
+        .profile-container h1 {
+            font-size: 1.5rem;
+        }
+
+        .profile-container h2 {
+            font-size: 1.2rem;
+        }
+
+        .profile-table thead th, .profile-table tbody td {
+            font-size: 0.9rem;
+            padding: 0.5em;
+        }
+    }
+    /*-----------------------add friend-------------------------- */
+    .friend-main-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .add-friend-container {
+        text-align: center;
+        background-color: #333333; /* Darker background for the form */
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px #FF4500; /* Orange glow for a darts theme */
+        width: 300px;
+    }
+
+    .add-friend-container h1 {
+        font-size: 24px;
+        color: #FF4500; /* Darts board red/orange color */
+        margin-bottom: 15px;
+    }
+
+    /*------------game calc(slang for calculator)---------------------------*/
 
 
- .game-container {
-     max-width: 800px;
-     margin: auto;
-     padding: 2rem;
-     text-align: center;
- }
+    .game-container {
+        max-width: 800px;
+        margin: auto;
+        padding: 2rem;
+        text-align: center;
+    }
 
-.header h1 {
-    font-size: 2.5rem;
-    color: #282828;
-}
+    .header h1 {
+        font-size: 2.5rem;
+        color: #282828;
+    }
 
-.game-info, .players-section, .game-summary {
-    margin-top: 2rem;
-    padding: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-}
+    .game-info, .players-section, .game-summary {
+        margin-top: 2rem;
+        padding: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
 
-.players-section {
-    display: flex;
-    justify-content: space-around;
-}
+    .players-section {
+        display: flex;
+        justify-content: space-around;
+    }
 
-.player {
-    flex: 1;
-    margin: 0 1rem;
-    padding: 1rem;
-    background: #f9f9f9;
-    border-radius: 8px;
-}
+    .player {
+        flex: 1;
+        margin: 0 1rem;
+        padding: 1rem;
+        background: #f9f9f9;
+        border-radius: 8px;
+    }
 
-.player h3 {
-    font-size: 1.5rem;
-    color: #004d00;
-}
+    .player h3 {
+        font-size: 1.5rem;
+        color: #004d00;
+    }
 
-.score-log {
-    margin-top: 1rem;
-    font-size: 0.9rem;
-}
+    .score-log {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+    }
 
-.game-summary h2 {
-    font-size: 1.5rem;
-    color: #ff004f;
-}
+    .game-summary h2 {
+        font-size: 1.5rem;
+        color: #ff004f;
+    }

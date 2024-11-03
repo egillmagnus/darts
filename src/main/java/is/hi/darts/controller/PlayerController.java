@@ -77,9 +77,11 @@ public class PlayerController {
     public String addFriendPage(Model model){
         return "addfriend";
     }
-
     @GetMapping ("/game")
     public String gamePage(Model model){
         return "game";
     }
+
+
+
 }

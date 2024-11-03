@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -174,6 +175,36 @@ public class GameController {
             return ResponseEntity.ok(participants);
         } catch (Exception e) {
             return ResponseEntity.status(400).body(null);
+        }
+    }
+
+    @GetMapping("/{gameid}")
+    public String gamePage(@PathVariable Long gameId, Model model) {
+        try {
+            // Fetch current user details from Security Context
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User currentUser = userService.getByEmail(userDetails.getUsername());
+
+            // Fetch game-specific data
+            Game game = gameService.getGameSetup(gameId);
+
+            // Add user, game, and other related data to the model
+            model.addAttribute("currentUser", currentUser);
+            model.addAttribute("game", game);
+            model.addAttribute("gameType", game.getGameType());
+            model.addAttribute("friends", userService.getFriendsList(currentUser.getId()));
+
+            // Retrieve players involved in the game
+            List<User> players = gameService.getGameParticipants(gameId);
+            model.addAttribute("players", players);
+
+            System.out.println("Loaded game page for game ID: " + gameId + " and user: " + currentUser.getUsername());
+
+            return "game";
+        } catch (Exception e) {
+            System.err.println("Error loading game page for game ID " + gameId + ": " + e.getMessage());
+            model.addAttribute("errorMessage", "Unable to load game page. Please try again later.");
+            return "error";
         }
     }
 }
