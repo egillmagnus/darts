@@ -15,24 +15,68 @@
     <div class="header-text">
         <h1>AMES <span>darts</span></h1>
     </div>
+    <!-- Centered Content Container -->
+    <div class="content-container">
+        <div class="tab-titles">
+            <p class="tab-links active-link" onclick="opentab('play')">play</p>
+            <p class="tab-links" onclick="opentab('profile')">profile</p>
+            <p class="tab-links" onclick="opentab('stats')">stats</p>
+        </div>
+
+        <div class="tab-contents active-tab" id="play">
+            <ul>
+                <li>1</li>
+                <li>2</li>
+            </ul>
+        </div>
+        <div class="tab-contents" id="profile">
+            <ul>
+                <li>3</li>
+                <li>4</li>
+            </ul>
+        </div>
+        <div class="tab-contents" id="stats">
+            <ul>
+                <li>5</li>
+                <li>6</li>
+            </ul>
+        </div>
+    </div>
 
     <!-- Sidebar navigation -->
     <div class="side-container">
         <nav>
             <ul>
-                <li><a href="home.html">Home</a></li>
+                <li><a href="#home">Home</a></li>
                 <li><a href="#playLocal">Play Local</a></li>
                 <li><a href="#playOnline">Play Online</a></li>
-                <li><a href="profile.html">Profile</a></li>
-                <li><a href="friends.html">Friends</a></li>
-                <li><a href="statistics.html">Statistics</a></li>
-                <li><a href="settings.html">Settings</a></li>
-                <li><a href="logout.html">Logout</a></li>
+                <li><a th:href="@{/profile}" class="button">profile</a></li>
+                <li><a href="#friends.html">Friends</a></li>
+                <li><a href="#statistics">Statistics</a></li>
+                <li><a href="#settings">Settings</a></li>
+                <li><a href="#logout">Logout</a></li>
             </ul>
         </nav>
     </div>
+
+
 </div>
 </body>
+<script>
+    var tabLinks = document.getElementsByClassName("tab-links");
+    var tabContents = document.getElementsByClassName("tab-contents");
+    function opentab(tabName){
+        for(tabLink of tabLinks){
+            tabLink.classList.remove("active-link");
+        }
+        for(tabContent of tabContents){
+            tabContent.classList.remove("active-tab");
+        }
+        event.currentTarget.classList.add("active-link")
+        document.getElementById(tabName).classList.add("active-tab")
+        console.log(tabName)
+    }
+</script>
 
 
 </html>

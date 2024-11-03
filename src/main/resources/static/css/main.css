@@ -176,6 +176,7 @@ ul li {
 .header-text {
     flex-grow: 1;
     font-size: 30px;
+    max-width: fit-content;
 }
 
 .header-text h1 {
@@ -197,16 +198,69 @@ ul li {
     align-items: flex-end;
 }
 
+.content-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--second-background-color);
+    color: var(--text-color);
+    border-radius: 0.5rem; /* Rounded corners */
+    box-shadow: 0 0 0.625rem rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    padding: 2em;
+    width: 60%; /* Adjust width as needed */
+    max-width: 600px;
+    margin: auto;
+}
+.tab-titles {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-bottom: 1em;
+}
+
+.tab-links {
+    cursor: pointer;
+    padding: 0.5em 1em;
+    color: var(--text-color);
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.tab-links.active-link {
+    color: var(--secondary-color); /* Color for active tab */
+}
+
+.tab-contents {
+    display: none;
+    width: 100%;
+    text-align: center;
+}
+
+.active-tab {
+    display: block;
+}
+
 
 nav ul {
     list-style-type: none;
     padding: 0;
     flex-direction: column;
-    width: 100%;
+    width: auto;
+    max-width: 100%;
+    list-style: none;
+    list-style-type: none;
+    display: flex;
+    gap: 1em;
+    margin: 0;
+    padding: 1rem;
 }
 
 nav ul li {
     margin: 10px 0;
+    width: auto;
+    max-width: 100%;
 }
 
 nav ul li a {
@@ -215,6 +269,8 @@ nav ul li a {
     font-size: 18px;
     position: relative;
     color: #004d00;
+    width: 100%;
+    height: 100%;
 }
 
 nav ul li a::after {
@@ -252,3 +308,180 @@ nav ul li a:hover::after {
         width: 100%;
     }
 }
+/*--------------------User profile----------------- */
+.profile-container {
+    background-color: #282828; /* Dark background to resemble a dartboard */
+    color: #ffffff; /* White text for readability */
+    width: 90%;
+    max-width: 600px;
+    margin: 2em auto;
+    padding: 1.5em;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Profile Header */
+.profile-container h1 {
+    color: #ff0000; /* Dartboard red */
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 1em;
+}
+
+/* Section Headers */
+.profile-container h2 {
+    color: #d3d3d3; /* Light gray */
+    border-bottom: 2px solid #006400; /* Dartboard green underline */
+    padding-bottom: 0.5em;
+    margin-top: 1.5em;
+    font-size: 1.5rem;
+}
+
+/* Table Styling */
+.profile-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+}
+
+.profile-table thead th {
+    background-color: #006400; /* Dartboard green */
+    color: #ffffff; /* White text */
+    font-weight: bold;
+    padding: 0.75em;
+    text-align: left;
+}
+
+.add-friend-button {
+    display: flex;
+    justify-content: flex-end; /* Moves the button to the right */
+}
+
+.button.profile {
+    margin-left: auto;
+}
+
+
+
+    .profile-table tbody td {
+        background-color: #282828; /* Dark background for table rows */
+        color: #ffffff; /* White text */
+        padding: 0.75em;
+        border-bottom: 1px solid #d3d3d3; /* Light gray border */
+    }
+
+    /* Button Styling */
+    .profile-table button {
+        padding: 0.5em 1em;
+        background-color: #ff0000; /* Dartboard red */
+        border: none;
+        color: #ffffff; /* White text */
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.3s ease;
+    }
+
+    .profile-table button:hover {
+        background-color: #cc0000; /* Darker red for hover */
+    }
+
+    /* Status Label Styling */
+    .status-label {
+        font-weight: bold;
+        color: #d3d3d3; /* Light gray */
+    }
+
+    /* Responsive design for smaller screens */
+    @media (max-width: 768px) {
+        .profile-container {
+            padding: 1em;
+        }
+
+        .profile-container h1 {
+            font-size: 1.5rem;
+        }
+
+        .profile-container h2 {
+            font-size: 1.2rem;
+        }
+
+        .profile-table thead th, .profile-table tbody td {
+            font-size: 0.9rem;
+            padding: 0.5em;
+        }
+    }
+    /*-----------------------add friend-------------------------- */
+    .friend-main-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .add-friend-container {
+        text-align: center;
+        background-color: #333333; /* Darker background for the form */
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px #FF4500; /* Orange glow for a darts theme */
+        width: 300px;
+    }
+
+    .add-friend-container h1 {
+        font-size: 24px;
+        color: #FF4500; /* Darts board red/orange color */
+        margin-bottom: 15px;
+    }
+
+    /*------------game calc(slang for calculator)---------------------------*/
+
+
+    .game-container {
+        max-width: 800px;
+        margin: auto;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .header h1 {
+        font-size: 2.5rem;
+        color: #282828;
+    }
+
+    .game-info, .players-section, .game-summary {
+        margin-top: 2rem;
+        padding: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+
+    .players-section {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .player {
+        flex: 1;
+        margin: 0 1rem;
+        padding: 1rem;
+        background: #f9f9f9;
+        border-radius: 8px;
+    }
+
+    .player h3 {
+        font-size: 1.5rem;
+        color: #004d00;
+    }
+
+    .score-log {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .game-summary h2 {
+        font-size: 1.5rem;
+        color: #ff004f;
+    }
