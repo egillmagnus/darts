@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Setup</title>
+</head>
+<body>
+<h1>Game Setup - Game ID: {{ gameId }}</h1>
+
+<!-- Game Type Selection -->
+<label for="gameType">Select Game Mode:</label>
+<select id="gameType" name="gameType">
+    <option value="501" {% if gameType == 501 %}selected{% endif %}>501</option>
+    <option value="301" {% if gameType == 301 %}selected{% endif %}>301</option>
+</select>
+
+<!-- Player List -->
+<h2>Players:</h2>
+<ul id="playerList">
+    {% for player in players %}
+    <li>{{ player.name }}</li>
+    {% endfor %}
+</ul>
+
+<!-- Invite Player -->
+<h3>Invite Player</h3>
+<input type="text" id="invitePlayer" placeholder="Enter player email or ID">
+<button onclick="invitePlayer()">Invite</button>
+
+<!-- Start Game Button -->
+<button onclick="startGame()">Start Game</button>
+
+<script>
+    // JavaScript functions to handle invite and game start actions
+    function invitePlayer() {
+        // Call to backend to add player
+    }
+
+    function startGame() {
+        // Call to backend to start the game
+    }
+</script>
+</body>
+</html>

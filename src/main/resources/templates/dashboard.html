@@ -49,7 +49,11 @@
             <ul>
                 <li><a href="#home">Home</a></li>
                 <li><a href="#playLocal">Play Local</a></li>
-                <li><a href="#playOnline">Play Online</a></li>
+                <li>
+                    <form th:action="@{/games/}" method="post" style="display:inline;">
+                        <button type="submit" class="button">Play Online</button>
+                    </form>
+                </li>
                 <li><a th:href="@{/profile}" class="button">profile</a></li>
                 <li><a href="#friends.html">Friends</a></li>
                 <li><a href="#statistics">Statistics</a></li>

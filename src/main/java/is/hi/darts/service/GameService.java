@@ -7,9 +7,6 @@ import java.util.List;
 
 public interface GameService {
 
-    // Start a new game
-    Game startNewGame(Game game);
-
     // Get the setup for a specific game
     Game getGameSetup(Long gameId) throws Exception;
 
@@ -24,6 +21,8 @@ public interface GameService {
 
     // Update game setup before starting
     Game updateGameSetup(Long gameId, Game updatedGame) throws Exception;
+
+    Long createNewGame(User user) throws Exception;
 
     // Join a multiplayer game
     void joinMultiplayerGame(Long gameId, Long userId) throws Exception;

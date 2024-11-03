@@ -8,12 +8,14 @@ public class Player {
 
     private Long id;
     private int score;
+    private String name;
 
     public Player() {
     }
 
     public Player(User user) {
         this.id = user.getId();
+        this.name = user.getUsername();
         this.score = 0;
     }
 
@@ -24,6 +26,10 @@ public class Player {
 
     public Long getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void setId(Long id) {

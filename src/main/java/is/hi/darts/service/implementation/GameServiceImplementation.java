@@ -21,8 +21,16 @@ public class GameServiceImplementation implements GameService {
     private UserRepository userRepository;
 
     @Override
-    public Game startNewGame(Game game) {
-        return gameRepository.save(game);
+    public Long createNewGame(User user) throws Exception {
+        try {
+            Game newGame = new Game( user );
+
+            Game savedGame = gameRepository.save(newGame);
+
+            return savedGame.getId();
+        } catch (Exception e) {
+            throw new Exception("Error creating new game", e);
+        }
     }
 
     @Override

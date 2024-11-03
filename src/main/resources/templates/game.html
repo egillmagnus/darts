@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darts Game Calculator</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<!-- Main Game Container -->
+<div class="game-container">
+    <!-- Header -->
+    <div class="header">
+        <h1>AMES Darts Game</h1>
+    </div>
+
+    <div class="content-container">
+        <div class="tab-titles">
+            <p class="tab-links active-link" onclick="opentab('settings')">game settings</p>
+            <p class="tab-links" onclick="opentab('gameplay')">gameplay</p>
+            <p class="tab-links" onclick="opentab('summary')">summary</p>
+        </div>
+
+        <div class="tab-contents active-tab" id="settings">
+            <h2>Game Settings</h2>
+            <p>Current Game: <span>301 / 501</span></p>
+            <p>Number of Players: <span>2</span></p>
+        </div>
+        <div class="tab-contents" id="gameplay">
+            <!-- Repeatable Player Section -->
+            <div class="player" th:if="${#lists.isEmpty(players)}">
+                <p>No players found. Please add players to begin the game.</p>
+            </div>
+
+            <div class="player" th:each="player : ${players}">
+                <h3 th:text="${player.name}">Player 1</h3>
+                <p>Score: <span th:text="${player.score}">0</span></p>
+
+                <!-- Input for Entering Scores -->
+                <form th:action="@{/play/score}" method="post">
+                    <label for="scoreInput">Enter Score:</label>
+                    <input type="number" id="scoreInput" name="scoreInput" min="0" max="180" required>
+                    <button type="submit">Submit Score</button>
+                </form>
+
+                <!-- Score Log -->
+                <div class="score-log">
+                    <h4>Score Log</h4>
+                    <ul>
+                        <li th:each="turn : ${player.turns}" th:text="${turn}">60</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-contents" id="summary">
+            <h2>Game Summary</h2>
+            <ul>
+                <li th:each="summary : ${gameSummary}">
+                    <span th:text="${summary}">Player 1 scored 60</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    var tabLinks = document.getElementsByClassName("tab-links");
+    var tabContents = document.getElementsByClassName("tab-contents");
+    function opentab(tabName){
+        for(var tabLink of tabLinks){
+            tabLink.classList.remove("active-link");
+        }
+        for(var tabContent of tabContents){
+            tabContent.classList.remove("active-tab");
+        }
+        event.currentTarget.classList.add("active-link");
+        document.getElementById(tabName).classList.add("active-tab");
+    }
+</script>
+</html>

@@ -3,6 +3,7 @@ package is.hi.darts.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,9 +30,6 @@ public class Game {
     @Column(name = "game_date")
     private LocalDateTime date;
 
-    @Column(name = "max_rounds")
-    private int maxRounds;
-
     @Column(name = "is_paused")
     private boolean isPaused;
 
@@ -46,19 +44,16 @@ public class Game {
     public Game() {
     }
 
-    public Game(Long id, List<Player> players, List<Round> rounds, int currentRound, String gameType, int maxRounds, boolean isPaused, GameStatus status) {
-        this.id = id;
-        this.players = players;
-        this.rounds = rounds;
-        this.currentRound = currentRound;
-        this.gameType = gameType;
-        this.maxRounds = maxRounds;
-        this.isPaused = isPaused;
-        this.status = status;
+    public Game(User user) {
+        this.id = null;
+        this.players = new ArrayList<>();
+        this.players.add(new Player(user));
+        this.rounds = new ArrayList<>();;
+        this.currentRound = 0;
+        this.gameType = "501";
+        this.status = GameStatus.SETUP;
         this.date = LocalDateTime.now();
-        if (players != null && !players.isEmpty()) {
-            this.currentPlayerIndex = 0; // Initialize with the first player
-        }
+        this.currentPlayerIndex = 0;
     }
 
     public Long getId() {
@@ -113,14 +108,6 @@ public class Game {
         this.gameType = gameType;
     }
 
-    public int getMaxRounds() {
-        return maxRounds;
-    }
-
-    public void setMaxRounds(int maxRounds) {
-        this.maxRounds = maxRounds;
-    }
-
     public boolean isPaused() {
         return isPaused;
     }
@@ -156,27 +143,19 @@ public class Game {
         return currentPlayerIndex;
     }
 
-    // Logic to submit a player's throw
     public void submitThrow(int score) {
         Player currentPlayer = getCurrentPlayer();
         if (currentPlayer == null) {
             throw new RuntimeException("No current player set");
         }
 
-        // Update the current player's score
         currentPlayer.setScore(currentPlayer.getScore() + score);
 
         Round newRound = new Round(currentRound, score, currentPlayer.getId());
         rounds.add(newRound);
 
-        // Move to the next round if necessary
-        if (currentRound < maxRounds) {
-            currentRound++;
-            nextPlayer();  // Move to the next player after the current round
-        } else {
-            // End game or handle final round logic
-            status = GameStatus.COMPLETED;
-        }
+        currentRound++;
+        nextPlayer();
     }
     // returns the total score by a player in a game
     public int getTotalScoreForPlayer(Long playerId) {
@@ -191,7 +170,6 @@ public class Game {
         if (currentPlayerIndex == -1 || currentRound == 0) {
             throw new RuntimeException("No round to undo");
         }
-
 
         // Undo the score from the current player
         Player currentPlayer = getCurrentPlayer();
@@ -215,12 +193,10 @@ public class Game {
             throw new RuntimeException("No round to undo for the current player");
         }
 
-        // Move to the previous round and previous player
         currentRound--;
         previousPlayer();
     }
 
-    // Move to the next player
     private void nextPlayer() {
         if (players != null && !players.isEmpty()) {
             currentPlayerIndex = (currentPlayerIndex + 1) % players.size();

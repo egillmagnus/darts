@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/games")
 public class GameController {
 
@@ -22,25 +24,32 @@ public class GameController {
     @Autowired
     private UserService userService;
 
-    // View Game Setup
     @GetMapping("/{gameId}/setup")
-    public ResponseEntity<Game> getGameSetup(@PathVariable Long gameId) {
+    public String getGameSetup(@PathVariable Long gameId, Model model) {
         try {
             Game gameSetup = gameService.getGameSetup(gameId);
-            return ResponseEntity.ok(gameSetup);
+            model.addAttribute("gameId", gameSetup.getId());
+            model.addAttribute("gameType", gameSetup.getGameType());
+            model.addAttribute("players", gameSetup.getPlayers());
+            return "games";
         } catch (Exception e) {
-            return ResponseEntity.status(400).body(null);
+            return "error";
         }
     }
 
     // Start a New Game
-    @PostMapping
-    public ResponseEntity<Game> startNewGame(@RequestBody Game game) {
+    @PostMapping("/")
+    public ResponseEntity<Void> createNewGame() {
         try {
-            Game createdGame = gameService.startNewGame(game);
-            return ResponseEntity.ok(createdGame);
+            System.out.println("Creating a game");
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User currentUser = userService.getByEmail(userDetails.getUsername());
+
+            Long gameId = gameService.createNewGame(currentUser);
+
+            return ResponseEntity.status(302).header("Location", "/games/" + gameId + "/setup").build();
         } catch (Exception e) {
-            return ResponseEntity.status(400).body(null);
+            return ResponseEntity.status(400).build();
         }
     }
 
@@ -163,6 +172,32 @@ public class GameController {
             return ResponseEntity.ok(participants);
         } catch (Exception e) {
             return ResponseEntity.status(400).body(null);
+        }
+    }
+
+    @GetMapping("/{gameId}")
+    public String gamePage(@PathVariable Long gameId, Model model) {
+        try {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User currentUser = userService.getByEmail(userDetails.getUsername());
+
+            Game game = gameService.getGameSetup(gameId);
+
+            model.addAttribute("currentUser", currentUser);
+            model.addAttribute("game", game);
+            model.addAttribute("gameType", game.getGameType());
+            model.addAttribute("friends", userService.getFriendsList(currentUser.getId()));
+
+            List<User> players = gameService.getGameParticipants(gameId);
+            model.addAttribute("players", players);
+
+            System.out.println("Loaded game page for game ID: " + gameId + " and user: " + currentUser.getUsername());
+
+            return "game";
+        } catch (Exception e) {
+            System.err.println("Error loading game page for game ID " + gameId + ": " + e.getMessage());
+            model.addAttribute("errorMessage", "Unable to load game page. Please try again later.");
+            return "error";
         }
     }
 
