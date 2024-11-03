@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Setup</title>
+</head>
+<body>
+<h1>Game Setup - Game ID: <span th:text="${gameId}"></span></h1>
+
+<!-- Game Type Selection -->
+<label for="gameType">Select Game Mode:</label>
+<select id="gameType" name="gameType">
+    <option value="501" th:selected="${gameType == 501}">501</option>
+    <option value="301" th:selected="${gameType == 301}">301</option>
+</select>
+
+<!-- Player List -->
+<h2>Players:</h2>
+<ul id="playerList">
+    <li th:each="player : ${players}" th:text="${player.name}"></li>
+</ul>
+
+<!-- Invite Player -->
+<h3>Invite a Friend</h3>
+    <tr th:each="friend : ${friendsList}" th:id="${'friend-' + friend.id}">
+        <td th:text="${friend.username}">Friend Username</td>
+        <td>
+            <!-- Remove Friend Button -->
+            <button th:onclick="'removeFriend(' + ${friend.id} + ', \'friend-' + ${friend.id} + '\')'">Remove</button>
+        </td>
+    </tr>
+<button onclick="inviteFriend()">Invite</button>
+
+<!-- Start Game Button -->
+<button onclick="startGame()">Start Game</button>
+
+<script>
+    // JavaScript functions to handle invite and game start actions
+    function invitePlayer() {
+        // Call to backend to add player
+    }
+
+    function startGame() {
+        // Call to backend to start the game
+    }
+</script>
+</body>
+</html>

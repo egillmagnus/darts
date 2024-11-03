@@ -31,7 +31,7 @@ public class GameController {
             model.addAttribute("gameId", gameSetup.getId());
             model.addAttribute("gameType", gameSetup.getGameType());
             model.addAttribute("players", gameSetup.getPlayers());
-            return "games";
+            return "gamesetup";
         } catch (Exception e) {
             return "error";
         }
