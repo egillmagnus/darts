@@ -23,7 +23,7 @@ public class GameServiceImplementation implements GameService {
     @Override
     public Long createNewGame(User user) throws Exception {
         try {
-            Game newGame = new Game( user );
+            Game newGame = new Game(user);
 
             Game savedGame = gameRepository.save(newGame);
 
@@ -161,6 +161,7 @@ public class GameServiceImplementation implements GameService {
                 .orElseThrow(() -> new Exception("Game not found"));
         gameRepository.delete(game);
     }
+
     public double calculateThreeDartAverage() {
         List<Game> allGames = gameRepository.findAll();
         double totalScore = allGames.stream()
@@ -174,7 +175,14 @@ public class GameServiceImplementation implements GameService {
 
         return totalDartsThrown == 0 ? 0 : totalScore / (double) totalDartsThrown;
     }
+    public List<Game> getSetupGames() {
+        // Call the repository method to get games with "ONGOING" status
+        return gameRepository.findByStatus(GameStatus.SETUP);
+    }
 
-
+    public List<Game> getOngoingGames() {
+    // Call the repository method to get games with "ONGOING" status
+    return gameRepository.findByStatus(GameStatus.ONGOING);
+}
 
 }

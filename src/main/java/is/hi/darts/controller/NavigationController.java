@@ -1,8 +1,10 @@
 package is.hi.darts.controller;
 
 import is.hi.darts.model.FriendRequest;
+import is.hi.darts.model.Game;
 import is.hi.darts.model.User;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -18,15 +20,30 @@ public class NavigationController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private GameService gameService;
 
     @GetMapping("/")
     public String home(Model model) {
+        // Check if the user is authenticated
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
+            // Redirect to dashboard if the user is authenticated
+            return "redirect:/dashboard";
+        }
+        // Otherwise, return the home view
         return "home";
     }
 
 
     @GetMapping("/dashboard")
-    public String dashboard(Model model) {return "dashboard";}
+    public String dashboard(Model model) {
+        List<Game> setupGames = gameService.getSetupGames();
+        List<Game> ongoingGames = gameService.getOngoingGames();
+        model.addAttribute("ongoingGames", ongoingGames);
+        model.addAttribute("setupGames", setupGames);
+        return "dashboard";
+    }
 
     @GetMapping("/profile")
     public String profile(Model model) {
