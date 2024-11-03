@@ -8,12 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/games")
 public class GameController {
 
@@ -23,27 +24,36 @@ public class GameController {
     @Autowired
     private UserService userService;
 
-    // View Game Setup
     @GetMapping("/{gameId}/setup")
-    public ResponseEntity<Game> getGameSetup(@PathVariable Long gameId) {
+    public String getGameSetup(@PathVariable Long gameId, Model model) {
         try {
             Game gameSetup = gameService.getGameSetup(gameId);
-            return ResponseEntity.ok(gameSetup);
+            model.addAttribute("gameId", gameSetup.getId());
+            model.addAttribute("gameType", gameSetup.getGameType());
+            model.addAttribute("players", gameSetup.getPlayers());
+            return "games";
         } catch (Exception e) {
-            return ResponseEntity.status(400).body(null);
+            return "error";
         }
     }
 
+
     // Start a New Game
-    @PostMapping
-    public ResponseEntity<Game> startNewGame(@RequestBody Game game) {
+    @PostMapping("/")
+    public ResponseEntity<Void> createNewGame() {
         try {
-            Game createdGame = gameService.startNewGame(game);
-            return ResponseEntity.ok(createdGame);
+            System.out.println("Creating a game");
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User currentUser = userService.getByEmail(userDetails.getUsername());
+
+            Long gameId = gameService.createNewGame(currentUser);
+
+            return ResponseEntity.status(302).header("Location", "/games/" + gameId + "/setup").build();
         } catch (Exception e) {
-            return ResponseEntity.status(400).body(null);
+            return ResponseEntity.status(400).build();
         }
     }
+
 
     // Invite Friends to a Game
     @PostMapping("/{gameId}/invite")
@@ -178,23 +188,19 @@ public class GameController {
         }
     }
 
-    @GetMapping("/{gameid}")
+    @GetMapping("/{gameId}")
     public String gamePage(@PathVariable Long gameId, Model model) {
         try {
-            // Fetch current user details from Security Context
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             User currentUser = userService.getByEmail(userDetails.getUsername());
 
-            // Fetch game-specific data
             Game game = gameService.getGameSetup(gameId);
 
-            // Add user, game, and other related data to the model
             model.addAttribute("currentUser", currentUser);
             model.addAttribute("game", game);
             model.addAttribute("gameType", game.getGameType());
             model.addAttribute("friends", userService.getFriendsList(currentUser.getId()));
 
-            // Retrieve players involved in the game
             List<User> players = gameService.getGameParticipants(gameId);
             model.addAttribute("players", players);
 
