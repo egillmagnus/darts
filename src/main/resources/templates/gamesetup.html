@@ -22,6 +22,14 @@
 
 <!-- Invite Player -->
 <h3>Invite a Friend</h3>
+<table>
+    <thead>
+    <tr>
+        <th>Username</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
     <tr th:each="friend : ${friendsList}" th:id="${'friend-' + friend.id}">
         <td th:text="${friend.username}">Friend Username</td>
         <td>
@@ -29,6 +37,9 @@
             <button th:onclick="'removeFriend(' + ${friend.id} + ', \'friend-' + ${friend.id} + '\')'">Remove</button>
         </td>
     </tr>
+    </tbody>
+</table>
+
 <button onclick="inviteFriend()">Invite</button>
 
 <!-- Start Game Button -->

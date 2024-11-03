@@ -1,6 +1,7 @@
 package is.hi.darts.repository;
 
 import is.hi.darts.model.Game;
+import is.hi.darts.model.GameStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -23,5 +24,6 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     List<Game> findTop10ByOrderByDateDesc();
 
     // Retrieve games by their status (e.g., ACTIVE, PAUSED)
-    List<Game> findByStatus(String status);
+    List<Game> findByStatus(GameStatus status);
+
 }
