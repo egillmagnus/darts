@@ -2,9 +2,11 @@ package is.hi.darts.service.implementation;
 
 import is.hi.darts.model.FriendRequest;
 import is.hi.darts.model.Friendship;
+import is.hi.darts.model.Game;
 import is.hi.darts.model.User;
 import is.hi.darts.repository.FriendRequestRepository;
 import is.hi.darts.repository.FriendshipRepository;
+import is.hi.darts.repository.GameRepository;
 import is.hi.darts.repository.UserRepository;
 import is.hi.darts.service.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,13 +23,15 @@ public class UserServiceImplementation implements UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final FriendRequestRepository friendRequestRepository;
     private final FriendshipRepository friendshipRepository;
+    private final GameRepository gameRepository;
 
     public UserServiceImplementation(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,
-                                     FriendRequestRepository friendRequestRepository, FriendshipRepository friendshipRepository) {
+                                     FriendRequestRepository friendRequestRepository, FriendshipRepository friendshipRepository, GameRepository gameRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.friendRequestRepository = friendRequestRepository;
         this.friendshipRepository = friendshipRepository;
+        this.gameRepository = gameRepository;
     }
 
     @Override
@@ -70,6 +74,23 @@ public class UserServiceImplementation implements UserService {
             throw new RuntimeException("Friend request already sent.");
         }
     }
+
+    // calculates the all-time three dart average for a player
+    public double calculateThreeDartAverage(User user) {
+        List<Game> userGames = gameRepository.findByPlayersId(user.getId());
+
+        double totalScore = userGames.stream()
+                .mapToDouble(game -> game.getTotalScoreForPlayer(user.getId()))
+                .sum();
+
+        int totalDartsThrown = userGames.stream()
+                .mapToInt(game -> game.getRounds().size() * 3) // Assuming each round has 3 darts
+                .sum();
+
+        return totalDartsThrown == 0 ? 0 : totalScore / totalDartsThrown;
+    }
+
+
 
     @Override
     public List<User> getFriendsList(Long userId) {
@@ -119,4 +140,6 @@ public class UserServiceImplementation implements UserService {
     public List<FriendRequest> getOutgoingRequests(Long userId) {
         return friendRequestRepository.findByRequester_Id(userId);
     }
+
+
 }

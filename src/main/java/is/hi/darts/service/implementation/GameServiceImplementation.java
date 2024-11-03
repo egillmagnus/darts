@@ -1,9 +1,6 @@
 package is.hi.darts.service.implementation;
 
-import is.hi.darts.model.Game;
-import is.hi.darts.model.GameStatus;
-import is.hi.darts.model.Player;
-import is.hi.darts.model.User;
+import is.hi.darts.model.*;
 import is.hi.darts.repository.GameRepository;
 import is.hi.darts.repository.UserRepository;
 import is.hi.darts.service.GameService;
@@ -144,9 +141,7 @@ public class GameServiceImplementation implements GameService {
                 .map(Player::getId)
                 .collect(Collectors.toList());
 
-        List<User> participants = userRepository.findAllById(playerIds);
-
-        return participants;
+        return userRepository.findAllById(playerIds);
     }
 
     public List<Game> getUserGames(Long userId) {
@@ -158,4 +153,20 @@ public class GameServiceImplementation implements GameService {
                 .orElseThrow(() -> new Exception("Game not found"));
         gameRepository.delete(game);
     }
+    public double calculateThreeDartAverage() {
+        List<Game> allGames = gameRepository.findAll();
+        double totalScore = allGames.stream()
+                .flatMap(game -> game.getRounds().stream())
+                .mapToInt(Round::getPlayerScore)
+                .sum();
+
+        long totalDartsThrown = allGames.stream()
+                .mapToLong(game -> game.getRounds().size() * 3L) // Each round represents 3 darts
+                .sum();
+
+        return totalDartsThrown == 0 ? 0 : totalScore / (double) totalDartsThrown;
+    }
+
+
+
 }

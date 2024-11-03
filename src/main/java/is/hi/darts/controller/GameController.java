@@ -144,17 +144,6 @@ public class GameController {
         }
     }
 
-    // Save Game State
-    @PostMapping("/{gameId}/save")
-    public ResponseEntity<String> saveGameState(@PathVariable Long gameId) {
-        try {
-            gameService.saveGameState(gameId);
-            return ResponseEntity.ok("Game state saved.");
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body("Failed to save game state: " + e.getMessage());
-        }
-    }
-
     // Retrieve Game with Dependent Data (rounds and scores)
     @GetMapping("/{gameId}/rounds")
     public ResponseEntity<Game> getGameWithRounds(@PathVariable Long gameId) {
@@ -176,4 +165,11 @@ public class GameController {
             return ResponseEntity.status(400).body(null);
         }
     }
+
+    @GetMapping("/average-score")
+    public ResponseEntity<String> getThreeDartAverageScore() {
+        double threeDartAverage = gameService.calculateThreeDartAverage();
+        return ResponseEntity.ok("{\"threeDartAverage\": " + threeDartAverage + "}");
+    }
+
 }

@@ -24,4 +24,5 @@ public interface UserService extends UserDetailsService {
     void removeFriend(Long userId, Long friendId); // Remove a friend by their user ID
     List<FriendRequest> getIncomingRequests(Long userId);  // Get incoming friend requests
     List<FriendRequest> getOutgoingRequests(Long userId);
+    double calculateThreeDartAverage(User user);
 }

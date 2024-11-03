@@ -77,4 +77,18 @@ public class PlayerController {
     public String addFriendPage(Model model){
         return "addfriend";
     }
+
+    @GetMapping("/users/{userId}/stats")
+    public ResponseEntity<Double> getUserThreeDartAverage(@PathVariable Long userId) {
+        try {
+            User user = userService.getById(userId);
+            double threeDartAverage = userService.calculateThreeDartAverage(user);
+            return ResponseEntity.ok(threeDartAverage);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(null);
+        }
+    }
+
 }
+
+
