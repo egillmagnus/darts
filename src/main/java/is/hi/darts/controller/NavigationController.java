@@ -27,25 +27,4 @@ public class NavigationController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {return "dashboard";}
-
-    @GetMapping("/profile")
-    public String profile(Model model) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        User user = userService.getByEmail(userDetails.getUsername());
-
-        Long userId = user.getId();
-        List<FriendRequest> incomingRequests = userService.getIncomingRequests(userId);
-        model.addAttribute("incomingRequests", incomingRequests);
-
-        List<FriendRequest> outgoingRequests = userService.getOutgoingRequests(userId);
-        model.addAttribute("outgoingRequests", outgoingRequests);
-
-        List<User> friendsList = userService.getFriendsList(userId);
-        model.addAttribute("friendsList", friendsList);
-
-        return "profile";
-    }
-
-
 }
