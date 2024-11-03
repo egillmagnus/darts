@@ -47,7 +47,7 @@ public class NavigationController {
         return "profile";
     }
 
-    @GetMapping("/addFriend")
+    @GetMapping("/addfriend")
     public String addFriendPage() {
         return "addFriend";
     }
