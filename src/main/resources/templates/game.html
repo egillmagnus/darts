@@ -17,7 +17,7 @@
         <strong><span th:text="${userNames[0]}"></span></strong>
         <span class="legs-won"><strong>Legs Won:</strong> <span th:text="${legsWon[0]}"></span></span>
     </div>
-    <div class="score"><strong>Current Score: </strong> <span th:text="${players[userIndex].score}"></span></div>
+    <div class="score"><strong>Current Score: </strong> <span th:text="${players[0].score}"></span></div>
     <div class="left">
         <p><strong>3 Dart Average: </strong> <span th:text="${threeDartAverages[0]}"></span> </p>
         <p><strong>First 9 Average: </strong><span th:text="${first9Averages[0]}"></span> </p>
@@ -40,14 +40,18 @@
 
 <!-- Player 2 Box (Red) -->
 <div class="player-box red">
-    <div class="score"><strong>Current Score:</strong> </div>
+    <div class="user-info">
+        <strong><span th:text="${userNames[1]}"></span></strong>
+        <span class="legs-won"><strong>Legs Won:</strong> <span th:text="${legsWon[1]}"></span></span>
+    </div>
+    <div class="score"><strong>Current Score: </strong> <span th:text="${players[1].score}"></span></div>
     <div class="left">
-        <p><strong>3 Dart Average:</strong> </p>
-        <p><strong>First 9 Average:</strong> </p>
+        <p><strong>3 Dart Average: </strong> <span th:text="${threeDartAverages[1]}"></span> </p>
+        <p><strong>First 9 Average: </strong><span th:text="${first9Averages[1]}"></span> </p>
     </div>
     <div class="right">
-        <p><strong>Last Score:</strong> </p>
-        <p><strong>Darts Thrown:</strong> </p>
+        <p><strong>Last Score: </strong><span th:text="${lastScores[1]}"></span> </p>
+        <p><strong>Darts Thrown: </strong><span th:text="${dartsThrown[1]}"></span> </p>
     </div>
 </div>
 
