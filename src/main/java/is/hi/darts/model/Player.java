@@ -10,13 +10,17 @@ public class Player {
     private int score;
     private String name;
 
+    private Long legsWon;
+
+
     public Player() {
     }
 
     public Player(User user) {
         this.id = user.getId();
-        this.name = user.getUsername();
-        this.score = 0;
+        this.name = user.getDisplayName();
+        this.score = 501;
+        this.legsWon = 0L;
     }
 
     public Player(Long id, int score, List<Round> rounds) {
@@ -42,5 +46,21 @@ public class Player {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public Long getLegsWon() {
+        return legsWon;
+    }
+
+    public void setLegsWon(long legsWon) {
+        this.legsWon = legsWon;
+    }
+
+    public void incrementLegsWon() {
+        this.legsWon++;
+    }
+
+    public void resetScoreForNewLeg(int maxScore) {
+        this.score = maxScore;
     }
 }
