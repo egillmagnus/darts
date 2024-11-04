@@ -1,5 +1,6 @@
 package is.hi.darts.service.implementation;
 
+import is.hi.darts.dto.GameUpdateMessage;
 import is.hi.darts.model.*;
 import is.hi.darts.repository.GameInviteRepository;
 import is.hi.darts.repository.GameRepository;
@@ -7,6 +8,7 @@ import is.hi.darts.repository.UserRepository;
 import is.hi.darts.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +26,12 @@ public class GameServiceImplementation implements GameService {
 
     @Autowired
     private UserRepository userRepository;
+
+    private final SimpMessagingTemplate messagingTemplate;
+
+    public GameServiceImplementation(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
     @Override
     public Long createNewGame(User user) throws Exception {
@@ -161,8 +169,17 @@ public class GameServiceImplementation implements GameService {
 
         game.submitThrow(score);
         gameRepository.save(game);
-    }
 
+        // Create GameUpdateMessage with updated player scores
+        List<GameUpdateMessage.PlayerScore> playerScores = game.getPlayers().stream()
+                .map(player -> new GameUpdateMessage.PlayerScore(player.getId(), player.getScore()))
+                .collect(Collectors.toList());
+
+        GameUpdateMessage message = new GameUpdateMessage(gameId, playerScores);
+
+        // Send the message to all clients subscribed to /topic/game-updates
+        messagingTemplate.convertAndSend("/topic/game-updates", message);
+    }
     @Override
     public void undoLastThrow(Long gameId) {
         Game game = gameRepository.findById(gameId)

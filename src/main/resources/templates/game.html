@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <title>Game Details</title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
+    <!-- Include SockJS and STOMP libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <meta name="_csrf" th:content="${_csrf.token}"/>
@@ -17,7 +23,8 @@
         <strong><span th:text="${userNames[0]}"></span></strong>
         <span class="legs-won"><strong>Legs Won:</strong> <span th:text="${legsWon[0]}"></span></span>
     </div>
-    <div class="score"><strong>Current Score: </strong> <span th:text="${players[0].score}"></span></div>
+
+    <div class="score"><strong>Current Score: </strong> <span th:attr="id='player-score-' + ${players[0].id}" th:text="${players[0].score}"></span></div>
     <div class="left">
         <p><strong>3 Dart Average: </strong> <span th:text="${threeDartAverages[0]}"></span> </p>
         <p><strong>First 9 Average: </strong><span th:text="${first9Averages[0]}"></span> </p>
@@ -44,7 +51,7 @@
         <strong><span th:text="${userNames[1]}"></span></strong>
         <span class="legs-won"><strong>Legs Won:</strong> <span th:text="${legsWon[1]}"></span></span>
     </div>
-    <div class="score"><strong>Current Score: </strong> <span th:text="${players[1].score}"></span></div>
+    <div class="score"><strong>Current Score: </strong> <span th:attr="id='player-score-' + ${players[1].id}" th:text="${players[1].score}"></span></div>
     <div class="left">
         <p><strong>3 Dart Average: </strong> <span th:text="${threeDartAverages[1]}"></span> </p>
         <p><strong>First 9 Average: </strong><span th:text="${first9Averages[1]}"></span> </p>
@@ -59,6 +66,40 @@
     // Retrieve CSRF token and header
     var token = $("meta[name='_csrf']").attr("content");
     var header = $("meta[name='_csrf_header']").attr("content");
+
+    // Connect to WebSocket server
+    let stompClient = null;
+    function connectWebSocket() {
+        const socket = new SockJS('/game-websocket');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic/game-updates', function (message) {
+                const gameUpdate = JSON.parse(message.body);
+                updateScores(gameUpdate);
+            });
+        });
+    }
+
+    // Update player scores in real-time
+    function updateScores(gameUpdate) {
+    console.log("Received game update:", gameUpdate);  // Log the received message
+
+    gameUpdate.playerScores.forEach(playerScore => {
+        const playerScoreElement = document.getElementById(`player-score-${playerScore.playerId}`);
+        console.log(playerScoreElement);
+        if (playerScoreElement) {
+            playerScoreElement.innerText = playerScore.score;
+            console.log(`Updated player ${playerScore.playerId} score to ${playerScore.score}`);
+
+        } else {
+            console.warn(`Element for player ${playerScore.playerId} not found.`);
+        }
+    });
+}
+
+
+    connectWebSocket(); // Call WebSocket connection function
 
     // JavaScript function to submit the score
     function submitScore() {
@@ -75,7 +116,6 @@
             },
             success: function(response) {
                 console.log("Score submitted successfully:", response);
-                window.location.reload(); // Reload the page to update the score display
             },
             error: function(xhr, status, error) {
                 console.error("Failed to submit score:", error);
@@ -96,7 +136,6 @@
             },
             success: function(response) {
                 console.log("Last throw undone:", response);
-                window.location.reload(); // Reload the page to update the score display
             },
             error: function(xhr, status, error) {
                 console.error("Failed to undo last throw:", error);
