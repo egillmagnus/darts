@@ -4,22 +4,37 @@
     <meta charset="UTF-8">
     <title>Game Details</title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <body>
 <h1>Game</h1>
-
 <a th:href="@{/}" class="button">Back to Dashboard</a>
 
-<!-- Player 1 Box (Green) -->
 <div class="player-box green">
-    <div class="score"><strong>Current Score:</strong> </div>
+    <div class="user-info">
+        <strong><span th:text="${userNames[0]}"></span></strong>
+        <span class="legs-won"><strong>Legs Won:</strong> <span th:text="${legsWon[0]}"></span></span>
+    </div>
+    <div class="score"><strong>Current Score: </strong> <span th:text="${players[userIndex].score}"></span></div>
     <div class="left">
-        <p><strong>3 Dart Average:</strong> </p>
-        <p><strong>First 9 Average:</strong> </p>
+        <p><strong>3 Dart Average: </strong> <span th:text="${threeDartAverages[0]}"></span> </p>
+        <p><strong>First 9 Average: </strong><span th:text="${first9Averages[0]}"></span> </p>
     </div>
     <div class="right">
-        <p><strong>Last Score:</strong> </p>
-        <p><strong>Darts Thrown:</strong> </p>
+        <p><strong>Last Score: </strong><span th:text="${lastScores[0]}"></span> </p>
+        <p><strong>Darts Thrown: </strong><span th:text="${dartsThrown[0]}"></span> </p>
+    </div>
+</div>
+
+<!-- Input for Score Entry -->
+<div class="score-entry">
+    <label for="roundScore">Enter Score for Round:</label>
+    <input type="number" id="roundScore" name="roundScore" min="0" max="180" placeholder="0">
+    <div class="button-container">
+        <button onclick="submitScore()">Submit Score</button>
+        <button onclick="undoThrow()">Undo Last Throw</button>
     </div>
 </div>
 
@@ -35,5 +50,57 @@
         <p><strong>Darts Thrown:</strong> </p>
     </div>
 </div>
+
+<script type="text/javascript">
+    // Retrieve CSRF token and header
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+
+    // JavaScript function to submit the score
+    function submitScore() {
+        const score = parseInt(document.getElementById('roundScore').value);
+        const gameId = [[${game.id}]]; // Inject gameId from Thymeleaf
+
+        $.ajax({
+            url: `/games/${gameId}/throws`,  // Endpoint to submit the score
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(score),  // Send score as JSON in the request body
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token); // Set CSRF token header
+            },
+            success: function(response) {
+                console.log("Score submitted successfully:", response);
+                window.location.reload(); // Reload the page to update the score display
+            },
+            error: function(xhr, status, error) {
+                console.error("Failed to submit score:", error);
+                alert("Failed to submit score: " + xhr.responseText); // Show error alert
+            }
+        });
+    }
+
+    // JavaScript function to undo the last throw
+    function undoThrow() {
+        const gameId = [[${game.id}]]; // Inject gameId from Thymeleaf
+
+        $.ajax({
+            url: `/games/${gameId}/undo`,  // Endpoint to undo the last throw
+            type: 'POST',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token); // Set CSRF token header
+            },
+            success: function(response) {
+                console.log("Last throw undone:", response);
+                window.location.reload(); // Reload the page to update the score display
+            },
+            error: function(xhr, status, error) {
+                console.error("Failed to undo last throw:", error);
+                alert("Failed to undo last throw: " + xhr.responseText); // Show error alert
+            }
+        });
+    }
+</script>
+
 </body>
 </html>

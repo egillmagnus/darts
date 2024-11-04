@@ -597,8 +597,8 @@ button:hover {
 .player-box {
     display: grid;
     grid-template-areas:
-        "score score score"
-        "left middle right";
+        "user-info user-info user-info"
+        "left score right";
     grid-template-columns: 1fr 2fr 1fr;
     padding: 20px;
     margin: 20px;
@@ -619,7 +619,22 @@ button:hover {
     border: 2px solid #8b0000; /* Dark red border */
 }
 
-/* Styling for the score in the top row */
+/* User info (username and legs won) at the top center */
+.player-box .user-info {
+    grid-area: user-info;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Position legs won to the right of the username */
+.player-box .user-info .legs-won {
+    margin-left: 10px; /* Space between username and legs won */
+}
+
+/* Centered current score in the middle row */
 .player-box .score {
     grid-area: score;
     font-size: 24px;
@@ -643,3 +658,41 @@ button:hover {
     flex-direction: column;
     align-items: flex-end;
 }
+
+
+/* Center the .score-entry container */
+.score-entry {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: 0 auto;
+    width: 50%; /* Adjust as needed */
+}
+
+/* Apply red color to the label text */
+.score-entry label {
+    color: red;
+    margin-bottom: 10px; /* Space between label and input */
+}
+
+/* Style the input field */
+.score-entry input {
+    margin-bottom: 10px; /* Space between input and button */
+    padding: 5px;
+    width: 100%; /* Full width within the container */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Style the button container to arrange buttons in a row */
+.button-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px; /* Optional: adds spacing between buttons */
+}
+
+/* Style the buttons */
+.score-entry button {
+    padding: 5px 10px;
+}
+

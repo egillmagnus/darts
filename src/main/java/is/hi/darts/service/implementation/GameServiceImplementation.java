@@ -29,11 +29,13 @@ public class GameServiceImplementation implements GameService {
     public Long createNewGame(User user) throws Exception {
         try {
             Game newGame = new Game(user);
+            System.out.println("Created game");
 
             Game savedGame = gameRepository.save(newGame);
-
+            System.out.println("Saved game");
             return savedGame.getId();
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             throw new Exception("Error creating new game", e);
         }
     }

@@ -2,11 +2,13 @@ package is.hi.darts.controller;
 
 import is.hi.darts.model.Game;
 import is.hi.darts.model.GameStatus;
+import is.hi.darts.model.Player;
 import is.hi.darts.model.User;
 import is.hi.darts.repository.GameInviteRepository;
 import is.hi.darts.service.GameService;
 import is.hi.darts.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,8 +16,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/games")
@@ -41,6 +45,7 @@ public class GameController {
             model.addAttribute("gameId", gameSetup.getId());
             model.addAttribute("gameType", gameSetup.getGameType());
             model.addAttribute("players", gameSetup.getPlayers());
+            model.addAttribute("legs", gameSetup.getTotalLegs());
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             User user = userService.getByEmail(userDetails.getUsername());
             Long userId = user.getId();
@@ -243,11 +248,46 @@ public class GameController {
 
             model.addAttribute("currentUser", currentUser);
             model.addAttribute("game", game);
-            model.addAttribute("gameType", game.getGameType());
-            model.addAttribute("friends", userService.getFriendsList(currentUser.getId()));
 
-            List<User> players = gameService.getGameParticipants(gameId);
+            List<Player> players = game.getPlayers();
             model.addAttribute("players", players);
+
+            int currentUserIndex = 0;
+
+            for (int i = 0; i < players.size(); i++) {
+                if (Objects.equals(players.get(i).getId(), currentUser.getId())) {
+                    currentUserIndex = i;
+                    break;
+                }
+            }
+            List<Double> threeDartAverages = new ArrayList<>();
+            List<Double> first9Averages = new ArrayList<>();
+            List<Double> lastScores = new ArrayList<>();
+            List<Long> dartsThrown = new ArrayList<>();
+            List<Long> legsWon = new ArrayList<>();
+            List<String> userNames = new ArrayList<>();
+
+            for (Player player : players) {
+                Long playerId = player.getId();
+
+                // Populate each list with values for the current player
+                threeDartAverages.add(game.getGameThreeDartAverage(playerId));
+                first9Averages.add(game.getGameFirst9Average(playerId));
+                lastScores.add(game.getLastScore(playerId));
+                dartsThrown.add(game.getDartsThrown(playerId));
+                legsWon.add(player.getLegsWon());
+                userNames.add(player.getName());
+            }
+
+
+
+            model.addAttribute("userIndex", currentUserIndex);
+            model.addAttribute("threeDartAverages", threeDartAverages);
+            model.addAttribute("first9Averages", first9Averages);
+            model.addAttribute("lastScores", lastScores);
+            model.addAttribute("dartsThrown", dartsThrown);
+            model.addAttribute("legsWon", legsWon);
+            model.addAttribute("userNames", userNames);
 
             System.out.println("Loaded game page for game ID: " + gameId + " and user: " + currentUser.getUsername());
 
