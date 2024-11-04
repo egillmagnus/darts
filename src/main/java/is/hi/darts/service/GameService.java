@@ -1,6 +1,7 @@
 package is.hi.darts.service;
 
 import is.hi.darts.model.Game;
+import is.hi.darts.model.GameInvite;
 import is.hi.darts.model.User;
 
 import java.util.List;
@@ -11,7 +12,16 @@ public interface GameService {
     Game getGameSetup(Long gameId) throws Exception;
 
     // Invite friends to a game
-    void inviteFriendToGame(Long gameId, Long friendId) throws Exception;
+    void inviteFriendToGame(Long gameId, Long friendId, Long userId) throws Exception;
+
+    // Accept an invitation to join a game
+    Long acceptInvitation(Long inviteId, Long userId) throws Exception;
+
+    // Decline an invitation (delete it)
+    void declineInvitation(Long inviteId) throws Exception;
+
+    // Retrieve all invitations for a given user
+    List<GameInvite> getInvitationsForUser(Long userId);
 
     // Pause a game
     void pauseGame(Long gameId) throws Exception;
@@ -23,9 +33,6 @@ public interface GameService {
     Game updateGameSetup(Long gameId, Game updatedGame) throws Exception;
 
     Long createNewGame(User user) throws Exception;
-
-    // Join a multiplayer game
-    void joinMultiplayerGame(Long gameId, Long userId) throws Exception;
 
     // Retrieve all games with sorting
     List<Game> getAllGames(String sort);

@@ -2,6 +2,7 @@ package is.hi.darts.controller;
 
 import is.hi.darts.model.FriendRequest;
 import is.hi.darts.model.Game;
+import is.hi.darts.model.GameInvite;
 import is.hi.darts.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -25,13 +26,10 @@ public class NavigationController {
 
     @GetMapping("/")
     public String home(Model model) {
-        // Check if the user is authenticated
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
-            // Redirect to dashboard if the user is authenticated
             return "redirect:/dashboard";
         }
-        // Otherwise, return the home view
         return "home";
     }
 
@@ -42,6 +40,19 @@ public class NavigationController {
         List<Game> ongoingGames = gameService.getOngoingGames();
         model.addAttribute("ongoingGames", ongoingGames);
         model.addAttribute("setupGames", setupGames);
+
+
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        User user = userService.getByEmail(userDetails.getUsername());
+
+        Long userId = user.getId();
+        List<GameInvite> incomingInvites = gameService.getInvitationsForUser(userId);
+
+        System.out.println(incomingInvites.size());
+
+        model.addAttribute("incomingInvites", incomingInvites);
+
         return "dashboard";
     }
 

@@ -1,6 +1,7 @@
 package is.hi.darts.service.implementation;
 
 import is.hi.darts.model.*;
+import is.hi.darts.repository.GameInviteRepository;
 import is.hi.darts.repository.GameRepository;
 import is.hi.darts.repository.UserRepository;
 import is.hi.darts.service.GameService;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,6 +18,9 @@ public class GameServiceImplementation implements GameService {
 
     @Autowired
     private GameRepository gameRepository;
+
+    @Autowired
+    private GameInviteRepository gameInviteRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -39,16 +44,67 @@ public class GameServiceImplementation implements GameService {
                 .orElseThrow(() -> new Exception("Game not found"));
     }
 
-    public void inviteFriendToGame(Long gameId, Long friendId) throws Exception {
+    public void inviteFriendToGame(Long gameId, Long friendId, Long inviterId) throws Exception {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new Exception("Game not found"));
+        if (game.getPlayers().size() != 1) {
+            throw new Exception("Game is full");
+        }
 
         User friend = userRepository.findById(friendId)
                 .orElseThrow(() -> new Exception("Friend not found"));
 
-        game.addPlayer(friend);
+        User inviter = userRepository.findById(inviterId)
+                .orElseThrow(() -> new Exception("Inviter not found"));
 
+        Long player1Id = game.getPlayers().get(0).getId();
+
+        if (player1Id.equals(friendId)) {
+            throw new Exception("Invitation failed: Cannot invite the existing player to the same game.");
+        }
+
+        if (!player1Id.equals(inviterId)) {
+            throw new Exception("You cant invite to another players game");
+        }
+
+        Optional<GameInvite> existingInvite = gameInviteRepository.findByGameIdAndUserId(gameId, friendId);
+        if (existingInvite.isPresent()) {
+            throw new Exception("Invitation failed: An invitation for this game and friend already exists.");
+        }
+        GameInvite invite = new GameInvite(gameId, friendId, inviterId);
+        gameInviteRepository.save(invite);
+    }
+
+
+    @Override
+    public Long acceptInvitation(Long inviteId, Long userId) throws Exception {
+        GameInvite invite = gameInviteRepository.findById(inviteId)
+                .orElseThrow(() -> new Exception("Invitation not found"));
+        Game game = gameRepository.findById(invite.getGameId())
+                .orElseThrow(() -> new Exception("Game not found"));
+        User user = userRepository.findById(invite.getUserId())
+                .orElseThrow(() -> new Exception("User not found"));
+
+        if (!invite.getUserId().equals(userId)) {
+            throw new Exception("Unauthorized: Only the invitee can accept this invitation.");
+        }
+
+        game.addPlayer(user);
         gameRepository.save(game);
+
+        gameInviteRepository.delete(invite);
+
+        return game.getId();
+    }
+
+    @Override
+    public void declineInvitation(Long inviteId) {
+        gameInviteRepository.deleteById(inviteId);
+    }
+
+    @Override
+    public List<GameInvite> getInvitationsForUser(Long userId) {
+        return gameInviteRepository.findByUserId(userId);
     }
 
 
@@ -80,17 +136,6 @@ public class GameServiceImplementation implements GameService {
         game.setGameType(updatedGame.getGameType());
 
         return gameRepository.save(game);
-    }
-
-    @Override
-    public void joinMultiplayerGame(Long gameId, Long userId) throws Exception {
-        Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new Exception("Game not found"));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new Exception("User not found"));
-
-        game.addPlayer(user);
-        gameRepository.save(game);
     }
 
     @Override

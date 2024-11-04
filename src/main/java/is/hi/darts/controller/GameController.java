@@ -1,7 +1,9 @@
 package is.hi.darts.controller;
 
 import is.hi.darts.model.Game;
+import is.hi.darts.model.GameStatus;
 import is.hi.darts.model.User;
+import is.hi.darts.repository.GameInviteRepository;
 import is.hi.darts.service.GameService;
 import is.hi.darts.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/games")
@@ -23,21 +26,33 @@ public class GameController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private GameInviteRepository gameInviteRepository;
 
     @GetMapping("/{gameId}/setup")
     public String getGameSetup(@PathVariable Long gameId, Model model) {
         try {
             Game gameSetup = gameService.getGameSetup(gameId);
+            if(gameSetup.getStatus() == GameStatus.ONGOING) {
+                return "redirect:/games/" + gameId;
+            } else if (gameSetup.getStatus() == GameStatus.COMPLETED) {
+                return "redirect:/games/" + gameId +"/stats";
+            }
             model.addAttribute("gameId", gameSetup.getId());
             model.addAttribute("gameType", gameSetup.getGameType());
             model.addAttribute("players", gameSetup.getPlayers());
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = userService.getByEmail(userDetails.getUsername());
+            Long userId = user.getId();
+            List<User> friendsList = userService.getFriendsList(userId);
+            model.addAttribute("friendsList", friendsList);
             return "gamesetup";
         } catch (Exception e) {
             return "error";
         }
     }
 
-    // Start a New Game
+    // Create a New Game
     @PostMapping("/")
     public ResponseEntity<Void> createNewGame() {
         try {
@@ -57,21 +72,58 @@ public class GameController {
     @PostMapping("/{gameId}/invite")
     public ResponseEntity<String> inviteFriend(@PathVariable Long gameId, @RequestBody Long friendId) {
         try {
-            gameService.inviteFriendToGame(gameId, friendId);
+            System.out.println(friendId);
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = userService.getByEmail(userDetails.getUsername());
+            Long userId = user.getId();
+            gameService.inviteFriendToGame(gameId, friendId, userId);
             return ResponseEntity.ok("Friend invited to the game.");
         } catch (Exception e) {
             return ResponseEntity.status(400).body("Failed to invite friend: " + e.getMessage());
         }
     }
 
-    // Join a Multiplayer Game
-    @PostMapping("/{gameId}/join")
-    public ResponseEntity<String> joinMultiplayerGame(@PathVariable Long gameId, @RequestParam Long userId) {
+    @PostMapping("/invitations/decline")
+    public ResponseEntity<String> declineInvitation(@RequestBody Long invitationId) {
         try {
-            gameService.joinMultiplayerGame(gameId, userId);
-            return ResponseEntity.ok("User successfully joined the multiplayer game.");
+            gameService.declineInvitation(invitationId);
+            return ResponseEntity.ok("Invitation declined.");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Failed to decline invitation: " + e.getMessage());
+        }
+    }
+
+    // Join a Multiplayer Game
+    @PostMapping("/{inviteId}/accept")
+    public ResponseEntity<String> joinMultiplayerGame(@PathVariable Long inviteId) {
+        try {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = userService.getByEmail(userDetails.getUsername());
+            Long userId = user.getId();
+            Long gameId = gameService.acceptInvitation(inviteId, userId);
+            return ResponseEntity.status(302).header("Location", "/games/" + gameId).build();
         } catch (Exception e) {
             return ResponseEntity.status(400).body("Failed to join the game: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/{gameId}/start")
+    public ResponseEntity<String> startGame(@PathVariable Long gameId, @RequestBody Map<String, Object> gameSettings) {
+        try {
+            String gameMode = (String) gameSettings.get("gameMode");
+            Integer numLegs = Integer.valueOf(gameSettings.get("numLegs").toString());
+
+            Game game = gameService.getGameSetup(gameId);
+
+            game.setGameType(gameMode);
+
+            game.setStatus(GameStatus.ONGOING);
+
+            gameService.updateGameSetup(gameId, game);
+
+            return ResponseEntity.ok("Game started successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Failed to start the game: " + e.getMessage());
         }
     }
 
@@ -182,6 +234,12 @@ public class GameController {
             User currentUser = userService.getByEmail(userDetails.getUsername());
 
             Game game = gameService.getGameSetup(gameId);
+
+            if(game.getStatus() == GameStatus.SETUP) {
+                return "redirect:/games/" + gameId + "/setup";
+            } else if (game.getStatus() == GameStatus.COMPLETED) {
+                return "redirect:/games/" + gameId +"/stats";
+            }
 
             model.addAttribute("currentUser", currentUser);
             model.addAttribute("game", game);

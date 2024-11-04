@@ -1,25 +1,23 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMES Darts</title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <body>
-<!-- Main Container for the layout -->
 <div class="main-container">
-    <!-- Header with title on the left and a button for opening the menu -->
     <div class="header-text">
         <h1>AMES <span>darts</span></h1>
     </div>
-    <!-- Centered Content Container -->
     <div class="content-container">
         <div class="tab-titles">
             <p class="tab-links active-link" onclick="opentab('ongoing')">ongoing</p>
-            <p class="tab-links" onclick="opentab('profile')">profile</p>
+            <p class="tab-links" onclick="opentab('invitations')">invitations</p>
             <p class="tab-links" onclick="opentab('stats')">stats</p>
         </div>
 
@@ -44,10 +42,17 @@
             </ul>
         </div>
 
-        <div class="tab-contents" id="profile">
+        <!-- Invitations Tab -->
+        <div class="tab-contents" id="invitations">
+            <h2>Game Invitations</h2>
             <ul>
-                <li>3</li>
-                <li>4</li>
+                <li th:each="invitation : ${incomingInvites}" th:id="'invitation-' + ${invitation.id}">
+                    <span th:text="'Game ID: ' + ${invitation.gameId}">Game ID</span>
+                    <form th:action="@{/games/{invitationId}/accept(invitationId=${invitation.id})}" method="post" style="display:inline;">
+                        <button type="submit" class="button">Accept</button>
+                    </form>
+                    <button th:onclick="'declineInvitation(' + ${invitation.id} + ')'">Decline</button>
+                </li>
             </ul>
         </div>
         <div class="tab-contents" id="stats">
@@ -84,21 +89,67 @@
 
 </div>
 </body>
-<script>
+
+<script th:inline="javascript">
     var tabLinks = document.getElementsByClassName("tab-links");
     var tabContents = document.getElementsByClassName("tab-contents");
+
     function opentab(tabName){
-        for(tabLink of tabLinks){
+        for(var tabLink of tabLinks){
             tabLink.classList.remove("active-link");
         }
-        for(tabContent of tabContents){
+        for(var tabContent of tabContents){
             tabContent.classList.remove("active-tab");
         }
-        event.currentTarget.classList.add("active-link")
-        document.getElementById(tabName).classList.add("active-tab")
-        console.log(tabName)
+        event.currentTarget.classList.add("active-link");
+        document.getElementById(tabName).classList.add("active-tab");
+    }
+
+    // CSRF token setup for AJAX
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+
+    // Accept Invitation Function
+    function acceptInvitation(invitationId, gameId) {
+        $.ajax({
+            url: '/games/' + gameId + '/join',
+            type: 'POST',
+            contentType: 'application/json',
+            beforeSend: function(xhr) {
+                if (header && token) {
+                    xhr.setRequestHeader(header, token);
+                }
+            },
+            success: function(response) {
+                alert("Invitation accepted.");
+                $('#invitation-' + invitationId).remove();
+            },
+            error: function(xhr, status, error) {
+                alert("Error: " + xhr.responseText);
+            }
+        });
+    }
+
+    function declineInvitation(invitationId) {
+        $.ajax({
+            url: '/games/invitations/decline',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(invitationId),
+            beforeSend: function(xhr) {
+                if (header && token) {
+                    xhr.setRequestHeader(header, token);
+                }
+            },
+            success: function(response) {
+                alert("Invitation declined.");
+                $('#invitation-' + invitationId).remove();
+            },
+            error: function(xhr, status, error) {
+                alert("Error: " + xhr.responseText);
+            }
+        });
     }
 </script>
-
 
 </html>

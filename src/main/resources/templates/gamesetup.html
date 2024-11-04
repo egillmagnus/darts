@@ -1,62 +1,114 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<link rel="stylesheet" th:href="@{/css/main.css}">
 <head>
     <meta charset="UTF-8">
     <title>Game Setup</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <body>
 <div class="game-setup-container">
-<h1>Game Setup - Game ID: <span th:text="${gameId}"></span></h1>
+    <h1>Game Setup - Game ID: <span th:text="${gameId}"></span></h1>
 
-<!-- Game Type Selection -->
-<label for="gameType">Select Game Mode:</label>
-<select id="gameType" name="gameType">
-    <option value="501" th:selected="${gameType == 501}">501</option>
-    <option value="301" th:selected="${gameType == 301}">301</option>
-</select>
+    <!-- Game Type Selection -->
+    <label for="gameType">Select Game Mode:</label>
+    <select id="gameType" name="gameType">
+        <option value="501" th:selected="${gameType == 501}">501</option>
+        <option value="301" th:selected="${gameType == 301}">301</option>
+    </select>
 
-<!-- Player List -->
-<h2>Players:</h2>
-<ul id="playerList">
-    <li th:each="player : ${players}" th:text="${player.name}"></li>
-</ul>
+    <!-- Legs Selection -->
+    <label for="numLegs">Select Number of Legs:</label>
+    <select id="numLegs" name="numLegs">
+        <option value="1">1</option>
+        <option value="3">3</option>
+        <option value="5">5</option>
+    </select>
 
-<!-- Invite Player -->
-<h3>Invite a Friend</h3>
-<table>
-    <thead>
-    <tr>
-        <th>Username</th>
-        <th>Action</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="friend : ${friendsList}" th:id="${'friend-' + friend.id}">
-        <td th:text="${friend.username}">Friend Username</td>
-        <td>
-            <!-- Remove Friend Button -->
-            <button th:onclick="'removeFriend(' + ${friend.id} + ', \'friend-' + ${friend.id} + '\')'">Remove</button>
-        </td>
-    </tr>
-    </tbody>
-</table>
+    <!-- Player List -->
+    <h2>Players:</h2>
+    <ul id="playerList">
+        <li th:each="player : ${players}" th:text="${player.name}"></li>
+    </ul>
 
-<button onclick="inviteFriend()">Invite</button>
+    <!-- Invite Player Friends -->
+    <h3>Invite Friends to the Game</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Username</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="friend : ${friendsList}" th:id="${'friend-' + friend.id}">
+            <td th:text="${friend.username}">Friend Username</td>
+            <td>
+                <button class="invite-btn" th:onclick="'inviteFriendToGame(' + ${friend.id} + ', ' + ${gameId} + ', \'friend-' + ${friend.id} + '\')'">Invite</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
-<!-- Start Game Button -->
-<button onclick="startGame()">Start Game</button>
+    <div class="button-group">
+        <button th:onclick="'startGame(' + ${gameId} + ')'">Start Game</button>
+    </div>
 </div>
-<script>
-    // JavaScript functions to handle invite and game start actions
-    function invitePlayer() {
-        // Call to backend to add player
+<script type="text/javascript">
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+
+    function inviteFriendToGame(friendId, gameId, rowId) {
+        console.log("Inviting friend to game");
+        $.ajax({
+            url: '/games/' + gameId + '/invite',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(friendId),
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token);
+            },
+            success: function() {
+                $('#' + rowId + ' .invite-btn').text('Invited').prop('disabled', true);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error inviting friend: " + error);
+            }
+        });
+
     }
 
-    function startGame() {
-        // Call to backend to start the game
+    function startGame(gameId) {
+        const gameMode = document.getElementById("gameType").value;
+        const numLegs = document.getElementById("numLegs").value;
+
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+
+        $.ajax({
+            url: `/games/${gameId}/start`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                gameMode: gameMode,
+                numLegs: numLegs
+            }),
+            beforeSend: function(xhr) {
+                if (header && token) {
+                    xhr.setRequestHeader(header, token);
+                }
+            },
+            success: function(response) {
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                alert("Error starting the game: " + xhr.responseText);
+            }
+        });
     }
+
 </script>
-
 </body>
 </html>
