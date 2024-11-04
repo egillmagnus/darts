@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" th:href="@{/css/main.css}">
 <head>
     <meta charset="UTF-8">
     <title>Game Setup</title>
 </head>
 <body>
+<div class="game-setup-container">
 <h1>Game Setup - Game ID: <span th:text="${gameId}"></span></h1>
 
 <!-- Game Type Selection -->
@@ -44,7 +46,7 @@
 
 <!-- Start Game Button -->
 <button onclick="startGame()">Start Game</button>
-
+</div>
 <script>
     // JavaScript functions to handle invite and game start actions
     function invitePlayer() {
@@ -55,5 +57,6 @@
         // Call to backend to start the game
     }
 </script>
+
 </body>
 </html>
