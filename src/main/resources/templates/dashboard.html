@@ -38,6 +38,7 @@
                     <span th:text="'Game ID: ' + ${game.id}">Game ID</span> -
                     <span th:text="${game.gameType}">Game Type</span> -
                     <span th:text="'Players: ' + ${game.players.size()}">Number of Players</span>
+                    <a th:href="@{/games/{gameId}(gameId=${game.id})}" class="button">play</a>
                 </li>
             </ul>
         </div>
