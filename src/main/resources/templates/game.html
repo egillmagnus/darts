@@ -84,41 +84,65 @@
     }
 
     // Update player scores in real-time
-    function updateScores(gameUpdate) {
+  function updateScores(gameUpdate) {
     console.log("Received game update:", gameUpdate);
 
     gameUpdate.playerScores.forEach(playerScore => {
-        // Update Score
         const playerScoreElement = document.getElementById(`player-score-${playerScore.playerId}`);
         if (playerScoreElement) {
             playerScoreElement.innerText = playerScore.score;
         }
 
-        // Update 3 Dart Average
         const threeDartAverageElement = document.getElementById(`three-dart-average-${playerScore.playerId}`);
         if (threeDartAverageElement) {
-            threeDartAverageElement.innerText = playerScore.threeDartAverage.toFixed(2);
+            const threeDartAverage = playerScore.threeDartAverage || 0.0;
+            threeDartAverageElement.innerText = parseFloat(threeDartAverage).toFixed(2);
         }
 
-        // Update First 9 Average
         const first9AverageElement = document.getElementById(`first-9-average-${playerScore.playerId}`);
         if (first9AverageElement) {
-            first9AverageElement.innerText = playerScore.first9Average.toFixed(2);
+            const first9Average = playerScore.first9Average || 0.0;
+            first9AverageElement.innerText = parseFloat(first9Average).toFixed(2);
         }
 
-        // Update Last Score
         const lastScoreElement = document.getElementById(`last-score-${playerScore.playerId}`);
         if (lastScoreElement) {
             lastScoreElement.innerText = playerScore.lastScore;
         }
 
-        // Update Darts Thrown
         const dartsThrownElement = document.getElementById(`darts-thrown-${playerScore.playerId}`);
         if (dartsThrownElement) {
             dartsThrownElement.innerText = playerScore.dartsThrown;
         }
     });
 }
+
+
+window.onload = function() {
+    const initialGameData = {
+        playerScores: [
+            {
+                playerId: [[${players[0].id}]],
+                score: [[${players[0].score}]],
+                threeDartAverage: [[${threeDartAverages[0]}]],
+                first9Average: [[${first9Averages[0]}]],
+                lastScore: [[${lastScores[0]}]],
+                dartsThrown: [[${dartsThrown[0]}]]
+            },
+            {
+                playerId: [[${players[1].id}]],
+                score: [[${players[1].score}]],
+                threeDartAverage: [[${threeDartAverages[1]}]],
+                first9Average: [[${first9Averages[1]}]],
+                lastScore: [[${lastScores[1]}]],
+                dartsThrown: [[${dartsThrown[1]}]]
+            }
+        ]
+    };
+
+    updateScores(initialGameData);
+};
+
 
 
 

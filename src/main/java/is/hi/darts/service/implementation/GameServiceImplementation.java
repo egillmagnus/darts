@@ -191,6 +191,19 @@ public class GameServiceImplementation implements GameService {
 
         game.undoLastThrow();
         gameRepository.save(game);
+        List<GameUpdateMessage.PlayerScore> playerScores = game.getPlayers().stream()
+                .map(player -> new GameUpdateMessage.PlayerScore(
+                        player.getId(),
+                        player.getScore(),
+                        game.getGameThreeDartAverage(player.getId()),
+                        game.getGameFirst9Average(player.getId()),
+                        (int) game.getLastScore(player.getId()),
+                        game.getDartsThrown(player.getId())
+                ))
+                .collect(Collectors.toList());
+
+        GameUpdateMessage message = new GameUpdateMessage(gameId, playerScores);
+        messagingTemplate.convertAndSend("/topic/game-updates", message);
     }
 
     @Override
