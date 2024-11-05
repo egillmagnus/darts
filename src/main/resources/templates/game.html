@@ -26,14 +26,15 @@
 
     <div class="score"><strong>Current Score: </strong> <span th:attr="id='player-score-' + ${players[0].id}" th:text="${players[0].score}"></span></div>
     <div class="left">
-        <p><strong>3 Dart Average: </strong> <span th:text="${threeDartAverages[0]}"></span> </p>
-        <p><strong>First 9 Average: </strong><span th:text="${first9Averages[0]}"></span> </p>
+        <p><strong>3 Dart Average: </strong> <span th:attr="id='three-dart-average-' + ${players[0].id}" th:text="${threeDartAverages[0]}"></span> </p>
+        <p><strong>First 9 Average: </strong><span th:attr="id='first-9-average-' + ${players[0].id}" th:text="${first9Averages[0]}"></span> </p>
     </div>
     <div class="right">
-        <p><strong>Last Score: </strong><span th:text="${lastScores[0]}"></span> </p>
-        <p><strong>Darts Thrown: </strong><span th:text="${dartsThrown[0]}"></span> </p>
+        <p><strong>Last Score: </strong><span th:attr="id='last-score-' + ${players[0].id}" th:text="${lastScores[0]}"></span> </p>
+        <p><strong>Darts Thrown: </strong><span th:attr="id='darts-thrown-' + ${players[0].id}" th:text="${dartsThrown[0]}"></span> </p>
     </div>
 </div>
+
 
 <!-- Input for Score Entry -->
 <div class="score-entry">
@@ -53,14 +54,15 @@
     </div>
     <div class="score"><strong>Current Score: </strong> <span th:attr="id='player-score-' + ${players[1].id}" th:text="${players[1].score}"></span></div>
     <div class="left">
-        <p><strong>3 Dart Average: </strong> <span th:text="${threeDartAverages[1]}"></span> </p>
-        <p><strong>First 9 Average: </strong><span th:text="${first9Averages[1]}"></span> </p>
+        <p><strong>3 Dart Average: </strong> <span th:attr="id='three-dart-average-' + ${players[1].id}" th:text="${threeDartAverages[1]}"></span> </p>
+        <p><strong>First 9 Average: </strong><span th:attr="id='first-9-average-' + ${players[1].id}" th:text="${first9Averages[1]}"></span> </p>
     </div>
     <div class="right">
-        <p><strong>Last Score: </strong><span th:text="${lastScores[1]}"></span> </p>
-        <p><strong>Darts Thrown: </strong><span th:text="${dartsThrown[1]}"></span> </p>
+        <p><strong>Last Score: </strong><span th:attr="id='last-score-' + ${players[1].id}" th:text="${lastScores[1]}"></span> </p>
+        <p><strong>Darts Thrown: </strong><span th:attr="id='darts-thrown-' + ${players[1].id}" th:text="${dartsThrown[1]}"></span> </p>
     </div>
 </div>
+
 
 <script type="text/javascript">
     // Retrieve CSRF token and header
@@ -83,20 +85,41 @@
 
     // Update player scores in real-time
     function updateScores(gameUpdate) {
-    console.log("Received game update:", gameUpdate);  // Log the received message
+    console.log("Received game update:", gameUpdate);
 
     gameUpdate.playerScores.forEach(playerScore => {
+        // Update Score
         const playerScoreElement = document.getElementById(`player-score-${playerScore.playerId}`);
-        console.log(playerScoreElement);
         if (playerScoreElement) {
             playerScoreElement.innerText = playerScore.score;
-            console.log(`Updated player ${playerScore.playerId} score to ${playerScore.score}`);
+        }
 
-        } else {
-            console.warn(`Element for player ${playerScore.playerId} not found.`);
+        // Update 3 Dart Average
+        const threeDartAverageElement = document.getElementById(`three-dart-average-${playerScore.playerId}`);
+        if (threeDartAverageElement) {
+            threeDartAverageElement.innerText = playerScore.threeDartAverage.toFixed(2);
+        }
+
+        // Update First 9 Average
+        const first9AverageElement = document.getElementById(`first-9-average-${playerScore.playerId}`);
+        if (first9AverageElement) {
+            first9AverageElement.innerText = playerScore.first9Average.toFixed(2);
+        }
+
+        // Update Last Score
+        const lastScoreElement = document.getElementById(`last-score-${playerScore.playerId}`);
+        if (lastScoreElement) {
+            lastScoreElement.innerText = playerScore.lastScore;
+        }
+
+        // Update Darts Thrown
+        const dartsThrownElement = document.getElementById(`darts-thrown-${playerScore.playerId}`);
+        if (dartsThrownElement) {
+            dartsThrownElement.innerText = playerScore.dartsThrown;
         }
     });
 }
+
 
 
     connectWebSocket(); // Call WebSocket connection function

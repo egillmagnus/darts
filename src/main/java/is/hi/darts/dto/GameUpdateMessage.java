@@ -6,7 +6,6 @@ public class GameUpdateMessage {
     private Long gameId;
     private List<PlayerScore> playerScores;
 
-    // Constructors
     public GameUpdateMessage() {}
 
     public GameUpdateMessage(Long gameId, List<PlayerScore> playerScores) {
@@ -14,7 +13,6 @@ public class GameUpdateMessage {
         this.playerScores = playerScores;
     }
 
-    // Getters and Setters
     public Long getGameId() {
         return gameId;
     }
@@ -31,20 +29,25 @@ public class GameUpdateMessage {
         this.playerScores = playerScores;
     }
 
-    // Nested PlayerScore class
     public static class PlayerScore {
         private Long playerId;
         private int score;
+        private double threeDartAverage;
+        private double first9Average;
+        private int lastScore;
+        private long dartsThrown;
 
-        // Constructors
         public PlayerScore() {}
 
-        public PlayerScore(Long playerId, int score) {
+        public PlayerScore(Long playerId, int score, double threeDartAverage, double first9Average, int lastScore, long dartsThrown) {
             this.playerId = playerId;
             this.score = score;
+            this.threeDartAverage = threeDartAverage;
+            this.first9Average = first9Average;
+            this.lastScore = lastScore;
+            this.dartsThrown = dartsThrown;
         }
 
-        // Getters and Setters
         public Long getPlayerId() {
             return playerId;
         }
@@ -59,6 +62,38 @@ public class GameUpdateMessage {
 
         public void setScore(int score) {
             this.score = score;
+        }
+
+        public double getThreeDartAverage() {
+            return threeDartAverage;
+        }
+
+        public void setThreeDartAverage(double threeDartAverage) {
+            this.threeDartAverage = threeDartAverage;
+        }
+
+        public double getFirst9Average() {
+            return first9Average;
+        }
+
+        public void setFirst9Average(double first9Average) {
+            this.first9Average = first9Average;
+        }
+
+        public int getLastScore() {
+            return lastScore;
+        }
+
+        public void setLastScore(int lastScore) {
+            this.lastScore = lastScore;
+        }
+
+        public long getDartsThrown() {
+            return dartsThrown;
+        }
+
+        public void setDartsThrown(long dartsThrown) {
+            this.dartsThrown = dartsThrown;
         }
     }
 }

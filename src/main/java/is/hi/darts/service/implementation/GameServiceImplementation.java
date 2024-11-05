@@ -170,14 +170,18 @@ public class GameServiceImplementation implements GameService {
         game.submitThrow(score);
         gameRepository.save(game);
 
-        // Create GameUpdateMessage with updated player scores
         List<GameUpdateMessage.PlayerScore> playerScores = game.getPlayers().stream()
-                .map(player -> new GameUpdateMessage.PlayerScore(player.getId(), player.getScore()))
+                .map(player -> new GameUpdateMessage.PlayerScore(
+                        player.getId(),
+                        player.getScore(),
+                        game.getGameThreeDartAverage(player.getId()),
+                        game.getGameFirst9Average(player.getId()),
+                        (int) game.getLastScore(player.getId()),
+                        game.getDartsThrown(player.getId())
+                ))
                 .collect(Collectors.toList());
 
         GameUpdateMessage message = new GameUpdateMessage(gameId, playerScores);
-
-        // Send the message to all clients subscribed to /topic/game-updates
         messagingTemplate.convertAndSend("/topic/game-updates", message);
     }
     @Override
