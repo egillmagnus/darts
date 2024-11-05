@@ -177,7 +177,8 @@ public class GameServiceImplementation implements GameService {
                         game.getGameThreeDartAverage(player.getId()),
                         game.getGameFirst9Average(player.getId()),
                         (int) game.getLastScore(player.getId()),
-                        game.getDartsThrown(player.getId())
+                        game.getDartsThrown(player.getId()),
+                        player.getLegsWon()
                 ))
                 .collect(Collectors.toList());
 
@@ -198,7 +199,8 @@ public class GameServiceImplementation implements GameService {
                         game.getGameThreeDartAverage(player.getId()),
                         game.getGameFirst9Average(player.getId()),
                         (int) game.getLastScore(player.getId()),
-                        game.getDartsThrown(player.getId())
+                        game.getDartsThrown(player.getId()),
+                        player.getLegsWon()
                 ))
                 .collect(Collectors.toList());
 

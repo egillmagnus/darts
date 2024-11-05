@@ -36,16 +36,18 @@ public class GameUpdateMessage {
         private double first9Average;
         private int lastScore;
         private long dartsThrown;
+        private long legsWon;
 
         public PlayerScore() {}
 
-        public PlayerScore(Long playerId, int score, double threeDartAverage, double first9Average, int lastScore, long dartsThrown) {
+        public PlayerScore(Long playerId, int score, double threeDartAverage, double first9Average, int lastScore, long dartsThrown, long legsWon) {
             this.playerId = playerId;
             this.score = score;
             this.threeDartAverage = threeDartAverage;
             this.first9Average = first9Average;
             this.lastScore = lastScore;
             this.dartsThrown = dartsThrown;
+            this.legsWon = legsWon;
         }
 
         public Long getPlayerId() {
@@ -94,6 +96,14 @@ public class GameUpdateMessage {
 
         public void setDartsThrown(long dartsThrown) {
             this.dartsThrown = dartsThrown;
+        }
+
+        public long getLegsWon() {
+            return legsWon;
+        }
+
+        public void setLegsWon(int legsWon) {
+            this.legsWon = legsWon;
         }
     }
 }

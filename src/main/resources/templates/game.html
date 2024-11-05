@@ -21,7 +21,7 @@
 <div class="player-box green">
     <div class="user-info">
         <strong><span th:text="${userNames[0]}"></span></strong>
-        <span class="legs-won"><strong>Legs Won:</strong> <span th:text="${legsWon[0]}"></span></span>
+        <strong>Legs Won:</strong> <span th:attr="id='legs-won-' + ${players[0].id}"  th:text="${legsWon[0]}"></span>
     </div>
 
     <div class="score"><strong>Current Score: </strong> <span th:attr="id='player-score-' + ${players[0].id}" th:text="${players[0].score}"></span></div>
@@ -50,7 +50,7 @@
 <div class="player-box red">
     <div class="user-info">
         <strong><span th:text="${userNames[1]}"></span></strong>
-        <span class="legs-won"><strong>Legs Won:</strong> <span th:text="${legsWon[1]}"></span></span>
+        <strong>Legs Won:</strong> <span th:attr="id='legs-won-' + ${players[1].id}" th:text="${legsWon[1]}"></span>
     </div>
     <div class="score"><strong>Current Score: </strong> <span th:attr="id='player-score-' + ${players[1].id}" th:text="${players[1].score}"></span></div>
     <div class="left">
@@ -113,6 +113,11 @@
         const dartsThrownElement = document.getElementById(`darts-thrown-${playerScore.playerId}`);
         if (dartsThrownElement) {
             dartsThrownElement.innerText = playerScore.dartsThrown;
+        }
+        const legsWonElement = document.getElementById(`legs-won-${playerScore.playerId}`);
+        if (legsWonElement) {
+        const legsWon = playerScore.legsWon || 0;
+            legsWonElement.innerText = parseInt(legsWon);
         }
     });
 }
