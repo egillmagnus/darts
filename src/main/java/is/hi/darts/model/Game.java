@@ -1,11 +1,12 @@
 package is.hi.darts.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static org.aspectj.runtime.internal.Conversions.longValue;
 
 @Entity
 @Table(name = "games")
@@ -21,6 +22,10 @@ public class Game {
     @ElementCollection
     @CollectionTable(name = "game_rounds", joinColumns = @JoinColumn(name = "game_id"))
     private List<Round> rounds;
+
+    @ElementCollection
+    @CollectionTable(name = "game_legs", joinColumns = @JoinColumn(name = "game_id"))
+    private List<Leg> legs = new ArrayList<>();
 
     @Column(name = "current_round")
     private int currentRound;
@@ -44,7 +49,6 @@ public class Game {
     @Column(name = "total_legs")
     private Long totalLegs;
 
-
     public Game() {
     }
 
@@ -52,13 +56,17 @@ public class Game {
         this.id = null;
         this.players = new ArrayList<>();
         this.players.add(new Player(user));
-        this.rounds = new ArrayList<>();;
+        this.rounds = new ArrayList<>();
+        this.legs = new ArrayList<>();
+        Leg firstLeg = new Leg(0);
+        legs.add(firstLeg);
         this.currentRound = 0;
         this.gameType = "501";
         this.status = GameStatus.SETUP;
         this.date = LocalDateTime.now();
         this.currentPlayerIndex = 0;
         this.totalLegs = 1L;
+        startNewLeg();
     }
 
     public Long getId() {
@@ -161,31 +169,30 @@ public class Game {
         if (currentPlayer == null) {
             throw new RuntimeException("No current player set");
         }
-        Set<Integer> impossibleFinishes = Set.of(169, 168, 166, 165, 163, 162, 159);
+        Set<Integer> impossibleFinishes = Set.of(168, 165, 162, 159);
+
+        Set<Integer> impossibleScores = Set.of(179, 178, 176, 175, 173, 172, 169, 166, 163);
 
         int currentScore = currentPlayer.getScore();
         int updatedScore = currentScore - score;
 
-        if (score < 0 || score > 180 || impossibleFinishes.contains(currentScore) && score == currentScore) {
+        if (score < 0 || score > 180 || impossibleScores.contains(score) || ( impossibleFinishes.contains(currentScore) && score == currentScore )) {
             throw new IllegalArgumentException(score + " is invalid");
         }
-        // Check if attempting to finish with an impossible score
 
 
         if (updatedScore == 0) {
-            // Perfect throw to finish at zero
             Round newRound = new Round(currentRound, score, currentPlayer.getId());
             rounds.add(newRound);
+            finishLeg();
             currentPlayer.incrementLegsWon();
             startNewLeg(); // Start a new leg
         } else if (updatedScore < 0 || updatedScore == 1) {
-            // Bust condition: do not update score, add a round with 0 score, and move to next player
             Round newRound = new Round(currentRound, 0, currentPlayer.getId());
             rounds.add(newRound);
             currentRound++;
             nextPlayer();
         } else {
-            // Valid throw that decreases the score without busting
             currentPlayer.setScore(updatedScore);
             Round newRound = new Round(currentRound, score, currentPlayer.getId());
             rounds.add(newRound);
@@ -194,9 +201,15 @@ public class Game {
         }
     }
 
+    private void finishLeg() {
+        legs.getLast().setEndIndex(rounds.size() - 1);
+        legs.getLast().setWinnerPlayerId(rounds.getLast().getPlayerId());
+        legs.add(new Leg(rounds.size()));
+    }
+
 
     public Long getCurrentLeg(){
-        return (Long) players.get(0).getLegsWon() + players.get(1).getLegsWon() + 1;
+        return longValue(legs.size());
     }
 
     // returns the total score by a player in a game
