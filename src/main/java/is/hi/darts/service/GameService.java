@@ -17,6 +17,8 @@ public interface GameService {
     // Accept an invitation to join a game
     Long acceptInvitation(Long inviteId, Long userId) throws Exception;
 
+    public void deleteGame(Long gameId) throws Exception;
+
     // Decline an invitation (delete it)
     void declineInvitation(Long inviteId) throws Exception;
 
