@@ -16,10 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Controller
 @RequestMapping("/games")
@@ -314,5 +311,16 @@ public class GameController {
         double threeDartAverage = gameService.calculateThreeDartAverage();
         return ResponseEntity.ok("{\"threeDartAverage\": " + threeDartAverage + "}");
     }
+
+    @DeleteMapping("/{gameId}")
+    public ResponseEntity<String> deleteGame(@PathVariable Long gameId) throws Exception {
+        try {
+            gameService.deleteGame(gameId);
+            return ResponseEntity.ok("Game deleted successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only games in SETUP state can be deleted.");
+        }
+    }
+
 
 }
