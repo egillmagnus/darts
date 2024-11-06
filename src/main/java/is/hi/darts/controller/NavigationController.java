@@ -36,10 +36,7 @@ public class NavigationController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        List<Game> setupGames = gameService.getSetupGames();
-        List<Game> ongoingGames = gameService.getOngoingGames();
-        model.addAttribute("ongoingGames", ongoingGames);
-        model.addAttribute("setupGames", setupGames);
+
 
 
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -47,6 +44,11 @@ public class NavigationController {
         User user = userService.getByEmail(userDetails.getUsername());
 
         Long userId = user.getId();
+
+        List<Game> setupGames = gameService.getSetupGames(userId);
+        List<Game> ongoingGames = gameService.getOngoingGames(userId);
+        model.addAttribute("ongoingGames", ongoingGames);
+        model.addAttribute("setupGames", setupGames);
         List<GameInvite> incomingInvites = gameService.getInvitationsForUser(userId);
 
         System.out.println(incomingInvites.size());

@@ -222,14 +222,15 @@ public class GameServiceImplementation implements GameService {
 
         return totalDartsThrown == 0 ? 0 : totalScore / (double) totalDartsThrown;
     }
-    public List<Game> getSetupGames() {
-        // Call the repository method to get games with "ONGOING" status
-        return gameRepository.findByStatus(GameStatus.SETUP);
+
+    public List<Game> getSetupGames(Long userId) {
+        // Fetch games with "SETUP" status where the user is a player
+        return gameRepository.findByStatusAndPlayersId(GameStatus.SETUP, userId);
     }
 
-    public List<Game> getOngoingGames() {
+    public List<Game> getOngoingGames(Long userId) {
     // Call the repository method to get games with "ONGOING" status
-    return gameRepository.findByStatus(GameStatus.ONGOING);
+    return gameRepository.findByStatusAndPlayersId(GameStatus.ONGOING, userId);
 }
 
 }

@@ -110,7 +110,11 @@ public class Game {
     }
 
     public void setGameType(String gameType) {
+
         this.gameType = gameType;
+        for (Player player : this.players ) {
+            player.setScore(Integer.parseInt(gameType));
+        }
     }
 
     public boolean isPaused() {

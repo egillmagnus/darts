@@ -58,7 +58,7 @@ public interface GameService {
     //
     double calculateThreeDartAverage();
 
-    List<Game> getOngoingGames();
-    List<Game> getSetupGames();
+    List<Game> getOngoingGames(Long userId);
+    List<Game> getSetupGames(Long userId);
 }
 
