@@ -205,13 +205,15 @@ ul li {
     justify-content: center;
     background-color: var(--second-background-color);
     color: var(--text-color);
-    border-radius: 0.5rem; /* Rounded corners */
-    box-shadow: 0 0 0.625rem rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    border-radius: 0.5rem;
+    box-shadow: 0 0 0.625rem rgba(0, 0, 0, 1);
     padding: 2em;
-    width: 60%; /* Adjust width as needed */
-    max-width: 600px;
-    margin: auto;
+    width: 80%; /* Increased from 60% to 80% */
+    max-width: 1000px; /* Increased max-width for larger screens */
+    margin: 1.5rem auto; /* Adjust margin for balance */
+    transition: all 0.3s ease;
 }
+
 .tab-titles {
     display: flex;
     justify-content: space-around;
@@ -221,13 +223,12 @@ ul li {
 
 .tab-links {
     cursor: pointer;
-    padding: 0.5em 1em;
+    padding: 0.8em 1.2em; /* Slightly larger for better visibility */
     color: var(--text-color);
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 1.4rem; /* Increased font size */
     text-align: center;
 }
-
 .tab-links.active-link {
     color: var(--secondary-color); /* Color for active tab */
 }
@@ -236,11 +237,49 @@ ul li {
     display: none;
     width: 100%;
     text-align: center;
+    max-height: 600px; /* Allow more content in each tab */
+    padding: 1.5em;
+    transition: all 0.3s ease;
 }
 
 .active-tab {
     display: block;
 }
+
+#ongoing.active-tab {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
+
+#ongoing > div {
+    width: 48%; /* Maintain equal column width */
+    padding: 1%;
+    overflow-y: auto;
+}
+
+#ongoing ul {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+#ongoing ul li {
+    background: #f0f0f0;
+    padding: 1em;
+    margin-bottom: 1em;
+    text-align: left;
+}
+
+#ongoing ul li a.button {
+    display: inline-block;
+    margin-top: 0.5em;
+    font-size: 1rem; /* Slightly larger buttons */
+    padding: 0.7em 1.2em;
+}
+
+
 
 
 nav ul {
