@@ -257,35 +257,29 @@ public class Game {
 
     // Logic to undo the last throw
     public void undoLastThrow() {
-        if (currentPlayerIndex == -1 || currentRound == 0) {
+        if (currentRound == 0 || rounds.isEmpty()) {
             throw new RuntimeException("No round to undo");
         }
 
-        // Undo the score from the current player
-        Player currentPlayer = getCurrentPlayer();
+        Round lastRound = rounds.get(rounds.size() - 1);
+        Player lastPlayer = players.get((currentPlayerIndex - 1 + players.size()) % players.size());
 
-        Round lastRoundForPlayer = null;
-        for (int i = rounds.size() - 1; i >= 0; i--) {
-            Round round = rounds.get(i);
-            if (round.getPlayerId().equals(currentPlayer.getId())) {
-                lastRoundForPlayer = round;
-                break;
-            }
-        }
-        if (lastRoundForPlayer != null) {
-            // Undo the score from the current player
-            int lastScore = lastRoundForPlayer.getPlayerScore();
-            currentPlayer.setScore(currentPlayer.getScore() + lastScore);
-
-            // Remove the last round for this player from the rounds list
-            rounds.remove(lastRoundForPlayer);
-        } else {
-            throw new RuntimeException("No round to undo for the current player");
+        if (lastPlayer == null) {
+            throw new RuntimeException("Player not found for the last round");
         }
 
-        currentRound--;
+        int lastScore = lastRound.getPlayerScore();
+        if (lastScore > 0) {
+            lastPlayer.setScore(lastPlayer.getScore() + lastScore);
+        }
+
+        rounds.remove(lastRound);
         previousPlayer();
+        if (currentRound > 0) {
+            currentRound--;
+        }
     }
+
 
     private void nextPlayer() {
         if (players != null && !players.isEmpty()) {

@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <title>Game Details</title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
+    <!-- Include SockJS and STOMP libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <meta name="_csrf" th:content="${_csrf.token}"/>
@@ -15,18 +21,20 @@
 <div class="player-box green">
     <div class="user-info">
         <strong><span th:text="${userNames[0]}"></span></strong>
-        <span class="legs-won"><strong>Legs Won:</strong> <span th:text="${legsWon[0]}"></span></span>
+        <strong>Legs Won:</strong> <span th:attr="id='legs-won-' + ${players[0].id}"  th:text="${legsWon[0]}"></span>
     </div>
-    <div class="score"><strong>Current Score: </strong> <span th:text="${players[userIndex].score}"></span></div>
+
+    <div class="score"><strong>Current Score: </strong> <span th:attr="id='player-score-' + ${players[0].id}" th:text="${players[0].score}"></span></div>
     <div class="left">
-        <p><strong>3 Dart Average: </strong> <span th:text="${threeDartAverages[0]}"></span> </p>
-        <p><strong>First 9 Average: </strong><span th:text="${first9Averages[0]}"></span> </p>
+        <p><strong>3 Dart Average: </strong> <span th:attr="id='three-dart-average-' + ${players[0].id}" th:text="${threeDartAverages[0]}"></span> </p>
+        <p><strong>First 9 Average: </strong><span th:attr="id='first-9-average-' + ${players[0].id}" th:text="${first9Averages[0]}"></span> </p>
     </div>
     <div class="right">
-        <p><strong>Last Score: </strong><span th:text="${lastScores[0]}"></span> </p>
-        <p><strong>Darts Thrown: </strong><span th:text="${dartsThrown[0]}"></span> </p>
+        <p><strong>Last Score: </strong><span th:attr="id='last-score-' + ${players[0].id}" th:text="${lastScores[0]}"></span> </p>
+        <p><strong>Darts Thrown: </strong><span th:attr="id='darts-thrown-' + ${players[0].id}" th:text="${dartsThrown[0]}"></span> </p>
     </div>
 </div>
+
 
 <!-- Input for Score Entry -->
 <div class="score-entry">
@@ -40,21 +48,110 @@
 
 <!-- Player 2 Box (Red) -->
 <div class="player-box red">
-    <div class="score"><strong>Current Score:</strong> </div>
+    <div class="user-info">
+        <strong><span th:text="${userNames[1]}"></span></strong>
+        <strong>Legs Won:</strong> <span th:attr="id='legs-won-' + ${players[1].id}" th:text="${legsWon[1]}"></span>
+    </div>
+    <div class="score"><strong>Current Score: </strong> <span th:attr="id='player-score-' + ${players[1].id}" th:text="${players[1].score}"></span></div>
     <div class="left">
-        <p><strong>3 Dart Average:</strong> </p>
-        <p><strong>First 9 Average:</strong> </p>
+        <p><strong>3 Dart Average: </strong> <span th:attr="id='three-dart-average-' + ${players[1].id}" th:text="${threeDartAverages[1]}"></span> </p>
+        <p><strong>First 9 Average: </strong><span th:attr="id='first-9-average-' + ${players[1].id}" th:text="${first9Averages[1]}"></span> </p>
     </div>
     <div class="right">
-        <p><strong>Last Score:</strong> </p>
-        <p><strong>Darts Thrown:</strong> </p>
+        <p><strong>Last Score: </strong><span th:attr="id='last-score-' + ${players[1].id}" th:text="${lastScores[1]}"></span> </p>
+        <p><strong>Darts Thrown: </strong><span th:attr="id='darts-thrown-' + ${players[1].id}" th:text="${dartsThrown[1]}"></span> </p>
     </div>
 </div>
+
 
 <script type="text/javascript">
     // Retrieve CSRF token and header
     var token = $("meta[name='_csrf']").attr("content");
     var header = $("meta[name='_csrf_header']").attr("content");
+
+    // Connect to WebSocket server
+    let stompClient = null;
+    function connectWebSocket() {
+        const socket = new SockJS('/game-websocket');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic/game-updates', function (message) {
+                const gameUpdate = JSON.parse(message.body);
+                updateScores(gameUpdate);
+            });
+        });
+    }
+
+    // Update player scores in real-time
+  function updateScores(gameUpdate) {
+    console.log("Received game update:", gameUpdate);
+
+    gameUpdate.playerScores.forEach(playerScore => {
+        const playerScoreElement = document.getElementById(`player-score-${playerScore.playerId}`);
+        if (playerScoreElement) {
+            playerScoreElement.innerText = playerScore.score;
+        }
+
+        const threeDartAverageElement = document.getElementById(`three-dart-average-${playerScore.playerId}`);
+        if (threeDartAverageElement) {
+            const threeDartAverage = playerScore.threeDartAverage || 0.0;
+            threeDartAverageElement.innerText = parseFloat(threeDartAverage).toFixed(2);
+        }
+
+        const first9AverageElement = document.getElementById(`first-9-average-${playerScore.playerId}`);
+        if (first9AverageElement) {
+            const first9Average = playerScore.first9Average || 0.0;
+            first9AverageElement.innerText = parseFloat(first9Average).toFixed(2);
+        }
+
+        const lastScoreElement = document.getElementById(`last-score-${playerScore.playerId}`);
+        if (lastScoreElement) {
+            lastScoreElement.innerText = playerScore.lastScore;
+        }
+
+        const dartsThrownElement = document.getElementById(`darts-thrown-${playerScore.playerId}`);
+        if (dartsThrownElement) {
+            dartsThrownElement.innerText = playerScore.dartsThrown;
+        }
+        const legsWonElement = document.getElementById(`legs-won-${playerScore.playerId}`);
+        if (legsWonElement) {
+        const legsWon = playerScore.legsWon || 0;
+            legsWonElement.innerText = parseInt(legsWon);
+        }
+    });
+}
+
+
+window.onload = function() {
+    const initialGameData = {
+        playerScores: [
+            {
+                playerId: [[${players[0].id}]],
+                score: [[${players[0].score}]],
+                threeDartAverage: [[${threeDartAverages[0]}]],
+                first9Average: [[${first9Averages[0]}]],
+                lastScore: [[${lastScores[0]}]],
+                dartsThrown: [[${dartsThrown[0]}]]
+            },
+            {
+                playerId: [[${players[1].id}]],
+                score: [[${players[1].score}]],
+                threeDartAverage: [[${threeDartAverages[1]}]],
+                first9Average: [[${first9Averages[1]}]],
+                lastScore: [[${lastScores[1]}]],
+                dartsThrown: [[${dartsThrown[1]}]]
+            }
+        ]
+    };
+
+    updateScores(initialGameData);
+};
+
+
+
+
+    connectWebSocket(); // Call WebSocket connection function
 
     // JavaScript function to submit the score
     function submitScore() {
@@ -71,7 +168,6 @@
             },
             success: function(response) {
                 console.log("Score submitted successfully:", response);
-                window.location.reload(); // Reload the page to update the score display
             },
             error: function(xhr, status, error) {
                 console.error("Failed to submit score:", error);
@@ -92,7 +188,6 @@
             },
             success: function(response) {
                 console.log("Last throw undone:", response);
-                window.location.reload(); // Reload the page to update the score display
             },
             error: function(xhr, status, error) {
                 console.error("Failed to undo last throw:", error);

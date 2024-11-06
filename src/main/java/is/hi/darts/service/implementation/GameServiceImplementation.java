@@ -1,5 +1,6 @@
 package is.hi.darts.service.implementation;
 
+import is.hi.darts.dto.GameUpdateMessage;
 import is.hi.darts.model.*;
 import is.hi.darts.repository.GameInviteRepository;
 import is.hi.darts.repository.GameRepository;
@@ -7,6 +8,7 @@ import is.hi.darts.repository.UserRepository;
 import is.hi.darts.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +26,12 @@ public class GameServiceImplementation implements GameService {
 
     @Autowired
     private UserRepository userRepository;
+
+    private final SimpMessagingTemplate messagingTemplate;
+
+    public GameServiceImplementation(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
     @Override
     public Long createNewGame(User user) throws Exception {
@@ -161,8 +169,22 @@ public class GameServiceImplementation implements GameService {
 
         game.submitThrow(score);
         gameRepository.save(game);
-    }
 
+        List<GameUpdateMessage.PlayerScore> playerScores = game.getPlayers().stream()
+                .map(player -> new GameUpdateMessage.PlayerScore(
+                        player.getId(),
+                        player.getScore(),
+                        game.getGameThreeDartAverage(player.getId()),
+                        game.getGameFirst9Average(player.getId()),
+                        (int) game.getLastScore(player.getId()),
+                        game.getDartsThrown(player.getId()),
+                        player.getLegsWon()
+                ))
+                .collect(Collectors.toList());
+
+        GameUpdateMessage message = new GameUpdateMessage(gameId, playerScores);
+        messagingTemplate.convertAndSend("/topic/game-updates", message);
+    }
     @Override
     public void undoLastThrow(Long gameId) {
         Game game = gameRepository.findById(gameId)
@@ -170,6 +192,20 @@ public class GameServiceImplementation implements GameService {
 
         game.undoLastThrow();
         gameRepository.save(game);
+        List<GameUpdateMessage.PlayerScore> playerScores = game.getPlayers().stream()
+                .map(player -> new GameUpdateMessage.PlayerScore(
+                        player.getId(),
+                        player.getScore(),
+                        game.getGameThreeDartAverage(player.getId()),
+                        game.getGameFirst9Average(player.getId()),
+                        (int) game.getLastScore(player.getId()),
+                        game.getDartsThrown(player.getId()),
+                        player.getLegsWon()
+                ))
+                .collect(Collectors.toList());
+
+        GameUpdateMessage message = new GameUpdateMessage(gameId, playerScores);
+        messagingTemplate.convertAndSend("/topic/game-updates", message);
     }
 
     @Override

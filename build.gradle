@@ -27,7 +27,6 @@ dependencies {
     // Spring Data JPA for database interaction
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.2.7.Final'
     implementation 'org.xerial:sqlite-jdbc:3.41.2.1'
 
@@ -41,19 +40,23 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
+    // Add WebSocket support for real-time updates
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
     // Development tools for hot reloading
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-     // MySQL Connector for database interaction
-     runtimeOnly 'com.mysql:mysql-connector-j'
+    // MySQL Connector for database interaction
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
+
 
 tasks.named('test') {
     useJUnitPlatform()

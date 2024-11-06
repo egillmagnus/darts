@@ -192,6 +192,16 @@ public class GameController {
     @PostMapping("/{gameId}/throws")
     public ResponseEntity<String> submitThrow(@PathVariable Long gameId, @RequestBody int score) {
         try {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User currentUser = userService.getByEmail(userDetails.getUsername());
+
+            Game game = gameService.getGameSetup(gameId);
+            Player currentPlayer = game.getCurrentPlayer();
+
+            // Check if it's the current user's turn
+            if (!currentPlayer.getId().equals(currentUser.getId())) {
+                return ResponseEntity.status(403).body("It's not your turn.");
+            }
             gameService.submitThrow(gameId, score);
             return ResponseEntity.ok("Score submitted.");
         } catch (Exception e) {
