@@ -22,28 +22,27 @@
         </div>
 
         <div class="tab-contents active-tab" id="ongoing">
-            <div>
-                <h2>Setup Games</h2>
-                <ul>
-                    <li th:each="game : ${setupGames}">
-                        <span th:text="'Game ID: ' + ${game.id}">Game ID</span> -
-                        <span th:text="${game.gameType}">Game Type</span> -
-                        <span th:text="'Players: ' + ${game.players.size()}">Number of Players</span>
-                        <a th:href="@{/games/{gameId}/setup(gameId=${game.id})}" class="button">Go to Setup</a>
-                    </li>
-                </ul>
-            </div>
-            <div>
-                <h2>Ongoing Games</h2>
-                <ul>
-                    <li th:each="game : ${ongoingGames}">
-                        <span th:text="'Game ID: ' + ${game.id}">Game ID</span> -
-                        <span th:text="${game.gameType}">Game Type</span> -
-                        <span th:text="'Players: ' + ${game.players.size()}">Number of Players</span>
-                        <a th:href="@{/games/{gameId}(gameId=${game.id})}" class="button">Play</a>
-                    </li>
-                </ul>
-            </div>
+            <h2>Setup Games</h2>
+            <ul>
+                <li th:each="game : ${setupGames}">
+                    <span th:text="'Game ID: ' + ${game.id}">Game ID</span> -
+                    <span th:text="${game.gameType}">Game Type</span> -
+                    <span th:text="'Players: ' + ${game.players.size()}">Number of Players</span>
+                    <a th:href="@{/games/{gameId}/setup(gameId=${game.id})}" class="button">Go to Setup</a>
+                    <button th:onclick="'deleteGame(' + ${game.id} + ')'">Delete Game</button>
+                </li>
+            </ul>
+
+            <h2>Ongoing Games</h2>
+            <ul>
+                <li th:each="game : ${ongoingGames}">
+                    <span th:text="'Game ID: ' + ${game.id}">Game ID</span> -
+                    <span th:text="${game.gameType}">Game Type</span> -
+                    <span th:text="'Players: ' + ${game.players.size()}">Number of Players</span>
+                    <a th:href="@{/games/{gameId}(gameId=${game.id})}" class="button">Play</a>
+
+                </li>
+            </ul>
         </div>
 
         <!-- Invitations Tab -->

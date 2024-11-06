@@ -240,8 +240,10 @@ public class GameServiceImplementation implements GameService {
     }
 
     public void deleteGame(Long gameId) throws Exception {
-        Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new Exception("Game not found"));
+        Game game = gameRepository.findById(gameId).orElseThrow(() -> new Exception("Game not found"));
+        if(game.getStatus() != GameStatus.SETUP) {
+            throw new Exception("Game not found");
+        }
         gameRepository.delete(game);
     }
 
