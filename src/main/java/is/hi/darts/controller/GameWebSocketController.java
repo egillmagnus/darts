@@ -2,6 +2,7 @@ package is.hi.darts.controller;
 
 import is.hi.darts.dto.GameUpdateMessage;
 import is.hi.darts.model.GameInvite;
+import is.hi.darts.model.Player;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
@@ -21,3 +22,4 @@ public class GameWebSocketController {
         return invite;
     }
 }
+

@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <title>Game Setup</title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </head>
 <meta name="_csrf" th:content="${_csrf.token}"/>
 <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
@@ -25,6 +28,8 @@
         <option value="1">1</option>
         <option value="3">3</option>
         <option value="5">5</option>
+        <option value="7">5</option>
+        <option value="9">5</option>
     </select>
 
     <!-- Player List -->
@@ -59,9 +64,36 @@
 <script type="text/javascript">
     var token = $("meta[name='_csrf']").attr("content");
     var header = $("meta[name='_csrf_header']").attr("content");
+    var gameId = [[${gameId}]];
+
+    let stompClient = null;
+    function connectWebSocket() {
+        const socket = new SockJS('/game-websocket');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic/game-setup/' + gameId, function (message) {
+                if (message.body === 'GAME_STARTED') {
+                    // Redirect to game page
+                    window.location.href = '/games/' + gameId;
+                }
+                console.log('Received message: ', message.body);
+                const player = JSON.parse(message.body);
+                addPlayerToList(player);
+            });
+        });
+    }
+
+    function addPlayerToList(player) {
+        var playerList = document.getElementById("playerList");
+        var li = document.createElement("li");
+        li.textContent = player.name;
+        playerList.appendChild(li);
+    }
+
+    connectWebSocket();
 
     function inviteFriendToGame(friendId, gameId, rowId) {
-        console.log("Inviting friend to game");
         $.ajax({
             url: '/games/' + gameId + '/invite',
             type: 'POST',
@@ -77,15 +109,11 @@
                 console.error("Error inviting friend: " + error);
             }
         });
-
     }
 
     function startGame(gameId) {
         const gameMode = document.getElementById("gameType").value;
         const numLegs = document.getElementById("numLegs").value;
-
-        var token = $("meta[name='_csrf']").attr("content");
-        var header = $("meta[name='_csrf_header']").attr("content");
 
         $.ajax({
             url: `/games/${gameId}/start`,
@@ -96,9 +124,7 @@
                 numLegs: numLegs
             }),
             beforeSend: function(xhr) {
-                if (header && token) {
-                    xhr.setRequestHeader(header, token);
-                }
+                xhr.setRequestHeader(header, token);
             },
             success: function(response) {
                 location.reload();
@@ -110,5 +136,6 @@
     }
 
 </script>
+
 </body>
 </html>
