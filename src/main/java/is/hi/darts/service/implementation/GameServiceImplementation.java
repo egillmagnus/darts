@@ -83,6 +83,8 @@ public class GameServiceImplementation implements GameService {
         }
         GameInvite invite = new GameInvite(gameId, friendId, inviterId);
         gameInviteRepository.save(invite);
+
+        messagingTemplate.convertAndSend("/topic/invites", invite);
     }
 
 
