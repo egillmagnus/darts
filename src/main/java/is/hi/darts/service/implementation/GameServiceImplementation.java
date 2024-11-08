@@ -26,7 +26,7 @@ public class GameServiceImplementation implements GameService {
 
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
     private final SimpMessagingTemplate messagingTemplate;
 
     public GameServiceImplementation(SimpMessagingTemplate messagingTemplate) {
@@ -83,6 +83,8 @@ public class GameServiceImplementation implements GameService {
         }
         GameInvite invite = new GameInvite(gameId, friendId, inviterId);
         gameInviteRepository.save(invite);
+
+        messagingTemplate.convertAndSend("/topic/invites", invite);
     }
 
 
@@ -103,6 +105,7 @@ public class GameServiceImplementation implements GameService {
         gameRepository.save(game);
 
         gameInviteRepository.delete(invite);
+        messagingTemplate.convertAndSend("/topic/game-setup/" + game.getId(), game.getPlayers().get(1));
 
         return game.getId();
     }
@@ -144,6 +147,10 @@ public class GameServiceImplementation implements GameService {
         game.setPlayers(updatedGame.getPlayers());
         game.setRounds(updatedGame.getRounds());
         game.setGameType(updatedGame.getGameType());
+
+        if(game.getStatus() == GameStatus.ONGOING){
+            messagingTemplate.convertAndSend("/topic/game-setup/" + gameId, "GAME_STARTED");
+        }
 
         return gameRepository.save(game);
     }

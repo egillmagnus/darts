@@ -6,13 +6,13 @@
     <title>AMES Darts</title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 </head>
 <meta name="_csrf" th:content="${_csrf.token}"/>
 <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <body>
-
 <div class="main-container">
-
     <div class="header-text">
         <h1>AMES <span>darts</span></h1>
     </div>
@@ -23,7 +23,6 @@
             <p class="tab-links" onclick="opentab('stats')">stats</p>
         </div>
 
-        <!-- Inside #ongoing -->
         <div class="tab-contents active-tab" id="ongoing">
             <div>
                 <h2>Setup Games</h2>
@@ -51,12 +50,10 @@
             </div>
         </div>
 
-
-
         <!-- Invitations Tab -->
         <div class="tab-contents" id="invitations">
             <h2>Game Invitations</h2>
-            <ul>
+            <ul id="invitations-list">
                 <li th:each="invitation : ${incomingInvites}" th:id="'invitation-' + ${invitation.id}">
                     <span th:text="'Game ID: ' + ${invitation.gameId}">Game ID</span>
                     <form th:action="@{/games/{invitationId}/accept(invitationId=${invitation.id})}" method="post" style="display:inline;">
@@ -98,8 +95,6 @@
             </ul>
         </nav>
     </div>
-
-
 </div>
 </body>
 
@@ -118,14 +113,12 @@
         document.getElementById(tabName).classList.add("active-tab");
     }
 
-    // CSRF token setup for AJAX
     var token = $("meta[name='_csrf']").attr("content");
     var header = $("meta[name='_csrf_header']").attr("content");
 
-    // Accept Invitation Function
     function acceptInvitation(invitationId, gameId) {
         $.ajax({
-            url: '/games/' + gameId + '/join',
+            url: '/games/' + invitationId + '/accept',
             type: 'POST',
             contentType: 'application/json',
             beforeSend: function(xhr) {
@@ -133,9 +126,8 @@
                     xhr.setRequestHeader(header, token);
                 }
             },
-            success: function(response) {
-                alert("Invitation accepted.");
-                $('#invitation-' + invitationId).remove();
+            success: function(response, status, xhr) {
+                window.location.href = "/games/" + gameId;
             },
             error: function(xhr, status, error) {
                 alert("Error: " + xhr.responseText);
@@ -163,6 +155,57 @@
             }
         });
     }
+
+    function deleteGame(gameId) {
+        fetch(`/games/${gameId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                [header]: token
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                response.text().then(text => {
+                    alert(text);
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred while trying to delete the game.");
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const socket = new SockJS('/game-websocket');
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function () {
+            console.log("Connected to WebSocket");
+
+            stompClient.subscribe('/topic/invites', function (message) {
+                const invite = JSON.parse(message.body);
+                showInvitation(invite);
+            });
+        });
+
+        function showInvitation(invite) {
+            const invitationsList = document.getElementById("invitations-list");
+            const inviteElement = document.createElement("li");
+            inviteElement.id = `invitation-${invite.id}`;
+            inviteElement.innerHTML = `
+                    <span>Game ID: ${invite.gameId}</span>
+                    <form onsubmit="acceptInvitation(${invite.id}, ${invite.gameId}); return false;" style="display:inline;">
+                        <button type="submit" class="button">Accept</button>
+                    </form>
+                    <button onclick="declineInvitation(${invite.id})">Decline</button>
+            `;
+            invitationsList.appendChild(inviteElement);
+        }
+    });
 </script>
 
 </html>
