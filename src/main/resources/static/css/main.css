@@ -237,7 +237,7 @@ ul li {
     display: none;
     width: 100%;
     text-align: center;
-    max-height: 600px; /* Allow more content in each tab */
+    max-height: 800px; /* Allow more content in each tab */
     padding: 1.5em;
     transition: all 0.3s ease;
 }
@@ -256,7 +256,8 @@ ul li {
 #ongoing > div {
     width: 48%; /* Maintain equal column width */
     padding: 1%;
-    overflow-y: auto;
+    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: 600px; /* Set max height to ensure scrollability */
 }
 
 #ongoing ul {
@@ -270,6 +271,8 @@ ul li {
     padding: 1em;
     margin-bottom: 1em;
     text-align: left;
+    overflow: hidden; /* Prevents content from spilling out */
+    border-radius: 0.5em;
 }
 
 #ongoing ul li a.button {
@@ -322,6 +325,29 @@ nav ul li a::after {
     bottom: -6px;
     transition: 0.5s;
 }
+#ongoing h2 {
+    text-align: left;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-size: 1.8rem;
+    color: var(--secondary-color);
+}
+
+.delete-button {
+    background-color: #ff004f; /* Bright red */
+    color: #fff;
+    border: none;
+    padding: 0.7em 1.2em;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 0.3rem;
+    transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+    background-color: #cc0039; /* Darker red on hover */
+}
+
 
 nav ul li a:hover::after {
     width: 100%;
