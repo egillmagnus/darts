@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Summary</title>
+    <!-- Link to your external CSS file -->
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="game-summary-container">
+    <header class="header">
+        <h1 class="header-text">
+            <span th:text="${player1.name}">Player 1 Name</span>
+            <span class="score" th:text="${player1stats.get('legsWon')}">0</span> -
+            <span class="score" th:text="${player2stats.get('legsWon')}">0</span>
+            <span th:text="${player2.name}">Player 2 Name</span>
+        </h1>
+    </header>
+
+    <table class="stats-table">
+        <thead>
+        <tr>
+            <th class="player-name" th:text="${player1.name}">Player 1</th>
+            <th class="stat-description">Statistic</th>
+            <th class="player-name" th:text="${player2.name}">Player 2</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Repeat this row for each statistic -->
+        <tr>
+            <td class="player-stat" th:text="${player1stats.get('threeDartAverage') ?: 'Unknown'}">Value</td>
+            <td class="stat-description">3 dart average</td>
+            <td class="player-stat" th:text="${player2stats.get('threeDartAverage') ?: 'Unknown'}">Value</td>
+        </tr>
+        <tr>
+            <td class="player-stat" th:text="${player1stats.get('first9Average')}">Value</td>
+            <td class="stat-description">First 9 average</td>
+            <td class="player-stat" th:text="${player2stats.get('first9Average')}">Value</td>
+        </tr>
+        <tr>
+            <td class="player-stat" th:text="${player1stats.get('first9Average')}">Value</td>
+            <td class="stat-description">Best leg</td>
+            <td class="player-stat" th:text="${player2stats.get('first9Average')}">Value</td>
+        </tr>
+        <tr>
+            <td class="player-stat" th:text="${player1stats.get('first9Average')}">Value</td>
+            <td class="stat-description">Worst leg</td>
+            <td class="player-stat" th:text="${player2stats.get('first9Average')}">Value</td>
+        </tr>
+        <tr>
+            <td class="player-stat" th:text="${player1stats.get('first9Average')}">Value</td>
+            <td class="stat-description">Highest score</td>
+            <td class="player-stat" th:text="${player2stats.get('first9Average')}">Value</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

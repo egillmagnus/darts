@@ -143,6 +143,9 @@ public class Game {
     public Long getTotalLegs(){
         return totalLegs;
     }
+    public void setTotalLegs(long totalLegs){
+        this.totalLegs = totalLegs;
+    }
 
 
     public Player getCurrentPlayer() {
@@ -308,11 +311,19 @@ public class Game {
     }
 
     public void startNewLeg() {
-        for (Player player : players) {
-            player.resetScoreForNewLeg(Integer.parseInt(gameType));
+        if(getCurrentLeg() > totalLegs){
+            this.status = GameStatus.COMPLETED;
+
         }
-        currentRound = 0;
-        currentPlayerIndex = 0;
-        totalLegs++;
+        else{
+            for (Player player : players) {
+                player.resetScoreForNewLeg(Integer.parseInt(gameType));
+            }
+            currentRound = 0;
+            currentPlayerIndex = 0;
+        }
+        System.out.println("max legs are " + totalLegs + "started new leg " + getCurrentLeg() + "and game state is " + status);
     }
+
+
 }

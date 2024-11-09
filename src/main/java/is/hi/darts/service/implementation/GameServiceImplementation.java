@@ -11,7 +11,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -191,6 +193,9 @@ public class GameServiceImplementation implements GameService {
 
         GameUpdateMessage message = new GameUpdateMessage(gameId, playerScores);
         messagingTemplate.convertAndSend("/topic/game-updates", message);
+        if(game.getStatus() == GameStatus.COMPLETED){
+            messagingTemplate.convertAndSend("/topic/game/" + gameId + "/status", "GAME_COMPLETED");
+        }
     }
     @Override
     public void undoLastThrow(Long gameId) {
@@ -274,8 +279,22 @@ public class GameServiceImplementation implements GameService {
     }
 
     public List<Game> getOngoingGames(Long userId) {
-    // Call the repository method to get games with "ONGOING" status
+
     return gameRepository.findByStatusAndPlayersId(GameStatus.ONGOING, userId);
 }
+    public Map<String, Object> getPlayerStats(Game game, Player player) {
+        Map<String, Object> stats = new HashMap<>();
 
+        Long playerId = player.getId();
+        stats.put("threeDartAverage", game.getGameThreeDartAverage(playerId));
+        stats.put("first9Average", game.getGameFirst9Average(playerId));
+        stats.put("dartsThrown", game.getDartsThrown(playerId));
+        stats.put("legsWon", player.getLegsWon());
+        stats.put("totalScore", game.getTotalScoreForPlayer(playerId));
+        // Add any other statistics you need
+
+        System.out.println("3dart " + stats.get("threeDartAverage") + "first9 "+ stats.get("first9Average"));
+
+        return stats;
+    }
 }

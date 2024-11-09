@@ -2,9 +2,11 @@ package is.hi.darts.service;
 
 import is.hi.darts.model.Game;
 import is.hi.darts.model.GameInvite;
+import is.hi.darts.model.Player;
 import is.hi.darts.model.User;
 
 import java.util.List;
+import java.util.Map;
 
 public interface GameService {
 
@@ -18,6 +20,8 @@ public interface GameService {
     Long acceptInvitation(Long inviteId, Long userId) throws Exception;
 
     public void deleteGame(Long gameId) throws Exception;
+
+    public Map<String, Object> getPlayerStats(Game game, Player player);
 
     // Decline an invitation (delete it)
     void declineInvitation(Long inviteId) throws Exception;

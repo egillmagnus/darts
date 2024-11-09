@@ -68,20 +68,34 @@
     // Retrieve CSRF token and header
     var token = $("meta[name='_csrf']").attr("content");
     var header = $("meta[name='_csrf_header']").attr("content");
+    var gameId = [[${gameId}]];
 
     // Connect to WebSocket server
-    let stompClient = null;
-    function connectWebSocket() {
-        const socket = new SockJS('/game-websocket');
-        stompClient = Stomp.over(socket);
-        stompClient.connect({}, function (frame) {
-            console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/game-updates', function (message) {
-                const gameUpdate = JSON.parse(message.body);
-                updateScores(gameUpdate);
-            });
+   let stompClient = null;
+   function connectWebSocket() {
+    const socket = new SockJS('/game-websocket');
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
+
+        // Subscribe to general game updates
+        stompClient.subscribe('/topic/game-updates', function (message) {
+            const gameUpdate = JSON.parse(message.body);
+            updateScores(gameUpdate); // Handle the game update (assuming updateScores is defined elsewhere)
         });
-    }
+
+        // Subscribe to game status updates for a specific game
+        stompClient.subscribe('/topic/game/' + gameId + '/status', function(message) {
+            const status = message.body;
+            if (status === 'GAME_COMPLETED') {
+                // Redirect to the game summary page if the game is completed
+                window.location.href = '/games/' + gameId + '/stats';
+            }
+        });
+    });
+}
+
 
     // Update player scores in real-time
   function updateScores(gameUpdate) {

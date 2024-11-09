@@ -201,6 +201,9 @@ public class GameController {
                 return ResponseEntity.status(403).body("It's not your turn.");
             }
             gameService.submitThrow(gameId, score);
+            //if(game.getStatus() == GameStatus.COMPLETED){
+                //
+            //}
             return ResponseEntity.ok("Score submitted.");
         } catch (Exception e) {
             return ResponseEntity.status(400).body("Failed to submit throw: " + e.getMessage());
@@ -278,7 +281,6 @@ public class GameController {
             for (Player player : players) {
                 Long playerId = player.getId();
 
-                // Populate each list with values for the current player
                 threeDartAverages.add(game.getGameThreeDartAverage(playerId));
                 first9Averages.add(game.getGameFirst9Average(playerId));
                 lastScores.add(game.getLastScore(playerId));
@@ -322,6 +324,48 @@ public class GameController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only games in SETUP state can be deleted.");
         }
     }
+
+    @GetMapping("/{gameId}/stats")
+    public String gameSummary(@PathVariable Long gameId, Model model) {
+        try {
+            // Retrieve the game using the gameId
+            Game game = gameService.getGameSetup(gameId);
+
+            // Check if the game exists and is completed
+            if (game == null || game.getStatus() != GameStatus.COMPLETED) {
+                model.addAttribute("errorMessage", "Game not found or not completed yet.");
+                return "error"; // Returns the "error.html" template
+            }
+
+            // Retrieve player data
+            List<Player> players = game.getPlayers();
+            if (players.size() != 2) {
+                model.addAttribute("errorMessage", "Game summary is only available for two-player games.");
+                return "error";
+            }
+
+            Player player1 = players.get(0);
+            Player player2 = players.get(1);
+
+            // Add necessary attributes to the model
+            model.addAttribute("player1", player1);
+            model.addAttribute("player2", player2);
+            model.addAttribute("game", game);
+
+            // Add player statistics
+            model.addAttribute("player1stats",gameService.getPlayerStats(game, player1) );
+            model.addAttribute("player2stats", gameService.getPlayerStats(game, player2));
+            System.out.println(gameService.getPlayerStats(game, player1).toString());
+
+            // Return the view name corresponding to "gamesummary.html"
+            return "gamesummary";
+
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "An error occurred while loading the game summary.");
+            return "error";
+        }
+    }
+
 
 
 }
