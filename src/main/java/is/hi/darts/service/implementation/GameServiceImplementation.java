@@ -288,9 +288,10 @@ public class GameServiceImplementation implements GameService {
         Long playerId = player.getId();
         stats.put("threeDartAverage", game.getGameThreeDartAverage(playerId));
         stats.put("first9Average", game.getGameFirst9Average(playerId));
-        stats.put("dartsThrown", game.getDartsThrown(playerId));
+        stats.put("bestLeg", game.getBestLegForPlayer(playerId));
+        stats.put("worstLeg", game.getWorstLegForPlayer(playerId));
         stats.put("legsWon", player.getLegsWon());
-        stats.put("totalScore", game.getTotalScoreForPlayer(playerId));
+        stats.put("totalScore", game.getHighestScoreForPlayer(playerId));
         // Add any other statistics you need
 
         System.out.println("3dart " + stats.get("threeDartAverage") + "first9 "+ stats.get("first9Average"));

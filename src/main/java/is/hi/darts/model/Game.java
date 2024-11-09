@@ -167,6 +167,119 @@ public class Game {
         return currentPlayerIndex;
     }
 
+
+    public Long getCurrentLeg(){
+        return longValue(legs.size());
+    }
+
+
+    // returns the total score by a player in a game
+    public int getTotalScoreForPlayer(Long playerId) {
+        return rounds.stream()
+                .filter(round -> round.getPlayerId().equals(playerId)) // Filter by playerId
+                .mapToInt(Round::getPlayerScore)
+                .sum();
+    }
+
+    public double getGameThreeDartAverage(Long playerId){
+        double totalScore = rounds.stream()
+                .filter(round -> round.getPlayerId().equals(playerId)) // Filter by playerId
+                .mapToDouble(Round::getPlayerScore)
+                .sum();
+
+        long totalRounds = rounds.stream()
+                .filter(round -> round.getPlayerId().equals(playerId)) // Filter by playerId
+                .count();
+
+        return totalScore / totalRounds;
+    }
+    public double getGameFirst9Average(Long playerId) {
+        // Calculate the sum of scores for the first 3 rounds by the specified player
+        double totalScoreFirst3Rounds = rounds.stream()
+                .filter(round -> round.getPlayerId().equals(playerId)) // Filter by playerId
+                .limit(3) // Limit to the first 3 rounds
+                .mapToDouble(Round::getPlayerScore)
+                .sum();
+
+        // Count the number of rounds (up to 3) for this player
+        long countFirst3Rounds = rounds.stream()
+                .filter(round -> round.getPlayerId().equals(playerId)) // Filter by playerId
+                .limit(3) // Limit to the first 3 rounds
+                .count();
+
+        // Calculate and return the average
+        return countFirst3Rounds > 0 ? totalScoreFirst3Rounds / countFirst3Rounds : 0;
+    }
+
+    public double getLastScore(Long playerId) {
+        for (int i = rounds.size() - 1; i >= 0; i--) {
+            Round round = rounds.get(i);
+            if (round.getPlayerId().equals(playerId)) {
+                return round.getPlayerScore();
+            }
+        }
+        return 0;
+    }
+
+    public Long getDartsThrown(Long playerId) {
+        long totalRounds = rounds.stream()
+                .filter(round -> round.getPlayerId().equals(playerId)) // Correctly filter rounds by playerId
+                .count(); // Count the number of filtered rounds
+
+        return totalRounds * 3; // Assuming each round involves 3 darts thrown
+    }
+
+    // Logic to undo the last throw
+
+    private void nextPlayer() {
+        if (players != null && !players.isEmpty()) {
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+        }
+    }
+    // Move to the previous player
+    private void previousPlayer() {
+        if (players != null && !players.isEmpty()) {
+            currentPlayerIndex = (currentPlayerIndex - 1 + players.size()) % players.size();
+        }
+    }
+    public void startNewLeg() {
+        if(getCurrentLeg() > totalLegs){
+            this.status = GameStatus.COMPLETED;
+
+        }
+        else{
+            for (Player player : players) {
+                player.resetScoreForNewLeg(Integer.parseInt(gameType));
+            }
+            currentRound = 0;
+            currentPlayerIndex = 0;
+        }
+        System.out.println("max legs are " + totalLegs + "started new leg " + getCurrentLeg() + "and game state is " + status);
+    }
+
+    public void undoLastThrow() {
+        if (currentRound == 0 || rounds.isEmpty()) {
+            throw new RuntimeException("No round to undo");
+        }
+
+        Round lastRound = rounds.get(rounds.size() - 1);
+        Player lastPlayer = players.get((currentPlayerIndex - 1 + players.size()) % players.size());
+
+        if (lastPlayer == null) {
+            throw new RuntimeException("Player not found for the last round");
+        }
+
+        int lastScore = lastRound.getPlayerScore();
+        if (lastScore > 0) {
+            lastPlayer.setScore(lastPlayer.getScore() + lastScore);
+        }
+
+        rounds.remove(lastRound);
+        previousPlayer();
+        if (currentRound > 0) {
+            currentRound--;
+        }
+    }
     public void submitThrow(int score) {
         Player currentPlayer = getCurrentPlayer();
         if (currentPlayer == null) {
@@ -203,127 +316,62 @@ public class Game {
             nextPlayer();
         }
     }
-
     private void finishLeg() {
         legs.getLast().setEndIndex(rounds.size() - 1);
         legs.getLast().setWinnerPlayerId(rounds.getLast().getPlayerId());
         legs.add(new Leg(rounds.size()));
     }
 
+    public long getBestLegForPlayer(Long playerId) {
+        long minDarts = Long.MAX_VALUE;
 
-    public Long getCurrentLeg(){
-        return longValue(legs.size());
+        for (Leg leg : legs) {
+            if (leg.getWinnerPlayerId() != null && leg.getWinnerPlayerId().equals(playerId)) {
+                int start = leg.getStartIndex();
+                int end = leg.getEndIndex();
+                long dartsUsed = rounds.subList(start, end + 1).stream()
+                        .filter(round -> round.getPlayerId().equals(playerId))
+                        .count() * 3;
+                if (dartsUsed < minDarts) {
+                    minDarts = dartsUsed;
+                }
+            }
+        }
+        return minDarts == Long.MAX_VALUE ? 0 : minDarts;
     }
 
-    // returns the total score by a player in a game
-    public int getTotalScoreForPlayer(Long playerId) {
-        return rounds.stream()
-                .filter(round -> round.getPlayerId().equals(playerId)) // Filter by playerId
-                .mapToInt(Round::getPlayerScore)
-                .sum();
+    public long getWorstLegForPlayer(Long playerId) {
+        long maxDarts = 0;
+
+        for (Leg leg : legs) {
+            if (leg.getWinnerPlayerId() != null && leg.getWinnerPlayerId().equals(playerId)) {
+                int start = leg.getStartIndex();
+                int end = leg.getEndIndex();
+                long dartsUsed = rounds.subList(start, end + 1).stream()
+                        .filter(round -> round.getPlayerId().equals(playerId))
+                        .count() * 3;
+                if (dartsUsed > maxDarts) {
+                    maxDarts = dartsUsed;
+                }
+            }
+        }
+        return maxDarts;
     }
 
-    public double getGameThreeDartAverage(Long playerId){
-        double totalScore = rounds.stream()
-                .filter(round -> round.getPlayerId().equals(playerId)) // Filter by playerId
-                .mapToDouble(Round::getPlayerScore)
-                .sum();
-
-        long totalRounds = rounds.stream()
-                .filter(round -> round.getPlayerId().equals(playerId)) // Filter by playerId
-                .count();
-
-        return totalScore / totalRounds;
-    }
-
-    public double getGameFirst9Average(Long playerId) {
-        // Calculate the sum of scores for the first 3 rounds by the specified player
-        double totalScoreFirst3Rounds = rounds.stream()
-                .filter(round -> round.getPlayerId().equals(playerId)) // Filter by playerId
-                .limit(3) // Limit to the first 3 rounds
-                .mapToDouble(Round::getPlayerScore)
-                .sum();
-
-        // Count the number of rounds (up to 3) for this player
-        long countFirst3Rounds = rounds.stream()
-                .filter(round -> round.getPlayerId().equals(playerId)) // Filter by playerId
-                .limit(3) // Limit to the first 3 rounds
-                .count();
-
-        // Calculate and return the average
-        return countFirst3Rounds > 0 ? totalScoreFirst3Rounds / countFirst3Rounds : 0;
-    }
-    public double getLastScore(Long playerId) {
-        for (int i = rounds.size() - 1; i >= 0; i--) {
-            Round round = rounds.get(i);
+    public int getHighestScoreForPlayer(Long playerId) {
+        int maxScore = 0;
+        for (Round round : rounds) {
             if (round.getPlayerId().equals(playerId)) {
-                return round.getPlayerScore();
+                int score = round.getPlayerScore();
+                if (score > maxScore) {
+                    maxScore = score;
+                }
             }
         }
-        return 0;
-    }
-    public Long getDartsThrown(Long playerId) {
-        long totalRounds = rounds.stream()
-                .filter(round -> round.getPlayerId().equals(playerId)) // Correctly filter rounds by playerId
-                .count(); // Count the number of filtered rounds
-
-        return totalRounds * 3; // Assuming each round involves 3 darts thrown
+        return maxScore;
     }
 
 
-    // Logic to undo the last throw
-    public void undoLastThrow() {
-        if (currentRound == 0 || rounds.isEmpty()) {
-            throw new RuntimeException("No round to undo");
-        }
-
-        Round lastRound = rounds.get(rounds.size() - 1);
-        Player lastPlayer = players.get((currentPlayerIndex - 1 + players.size()) % players.size());
-
-        if (lastPlayer == null) {
-            throw new RuntimeException("Player not found for the last round");
-        }
-
-        int lastScore = lastRound.getPlayerScore();
-        if (lastScore > 0) {
-            lastPlayer.setScore(lastPlayer.getScore() + lastScore);
-        }
-
-        rounds.remove(lastRound);
-        previousPlayer();
-        if (currentRound > 0) {
-            currentRound--;
-        }
-    }
-
-
-    private void nextPlayer() {
-        if (players != null && !players.isEmpty()) {
-            currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-        }
-    }
-
-    // Move to the previous player
-    private void previousPlayer() {
-        if (players != null && !players.isEmpty()) {
-            currentPlayerIndex = (currentPlayerIndex - 1 + players.size()) % players.size();
-        }
-    }
-
-    public void startNewLeg() {
-        if(getCurrentLeg() > totalLegs){
-            this.status = GameStatus.COMPLETED;
-
-        }
-        else{
-            for (Player player : players) {
-                player.resetScoreForNewLeg(Integer.parseInt(gameType));
-            }
-            currentRound = 0;
-            currentPlayerIndex = 0;
-        }
-        System.out.println("max legs are " + totalLegs + "started new leg " + getCurrentLeg() + "and game state is " + status);
-    }
 
 
 }
