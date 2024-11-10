@@ -1,6 +1,8 @@
 package is.hi.darts.controller;
 
+import is.hi.darts.model.Game;
 import is.hi.darts.model.User;
+import is.hi.darts.service.GameService;
 import is.hi.darts.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,8 @@ public class PlayerController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private GameService gameService;
 
     // Add a Friend
     @PostMapping("/friends/add")

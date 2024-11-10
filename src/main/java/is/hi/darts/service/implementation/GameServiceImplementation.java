@@ -233,6 +233,10 @@ public class GameServiceImplementation implements GameService {
         return gameRepository.findById(gameId).orElse(null);
     }
 
+    public List<Game> getUserCompletedGames(Long userId) {
+        return gameRepository.findByStatusAndPlayersId(GameStatus.COMPLETED, userId);
+    }
+
     @Override
     public List<User> getGameParticipants(Long gameId) {
         Game game = gameRepository.findById(gameId)
@@ -267,14 +271,13 @@ public class GameServiceImplementation implements GameService {
                 .sum();
 
         long totalDartsThrown = allGames.stream()
-                .mapToLong(game -> game.getRounds().size() * 3L) // Each round represents 3 darts
+                .mapToLong(game -> game.getRounds().size() * 3L)
                 .sum();
 
         return totalDartsThrown == 0 ? 0 : totalScore / (double) totalDartsThrown;
     }
 
     public List<Game> getSetupGames(Long userId) {
-        // Fetch games with "SETUP" status where the user is a player
         return gameRepository.findByStatusAndPlayersId(GameStatus.SETUP, userId);
     }
 
@@ -286,14 +289,14 @@ public class GameServiceImplementation implements GameService {
         Map<String, Object> stats = new HashMap<>();
 
         Long playerId = player.getId();
+
+
         stats.put("threeDartAverage", game.getGameThreeDartAverage(playerId));
         stats.put("first9Average", game.getGameFirst9Average(playerId));
         stats.put("bestLeg", game.getBestLegForPlayer(playerId));
         stats.put("worstLeg", game.getWorstLegForPlayer(playerId));
         stats.put("legsWon", player.getLegsWon());
-        stats.put("totalScore", game.getHighestScoreForPlayer(playerId));
-        // Add any other statistics you need
-
+        stats.put("highScore", game.getHighestScoreForPlayer(playerId));
         System.out.println("3dart " + stats.get("threeDartAverage") + "first9 "+ stats.get("first9Average"));
 
         return stats;

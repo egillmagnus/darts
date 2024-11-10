@@ -27,4 +27,5 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     List<Game> findByStatus(GameStatus status);
 
     List<Game> findByStatusAndPlayersId(GameStatus status, Long userId);
+
 }

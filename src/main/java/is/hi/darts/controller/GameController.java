@@ -114,11 +114,12 @@ public class GameController {
     public ResponseEntity<String> startGame(@PathVariable Long gameId, @RequestBody Map<String, Object> gameSettings) {
         try {
             String gameMode = (String) gameSettings.get("gameMode");
-            Integer numLegs = Integer.valueOf(gameSettings.get("numLegs").toString());
+            int numLegs = Integer.parseInt(gameSettings.get("numLegs").toString());
 
             Game game = gameService.getGameSetup(gameId);
 
             game.setGameType(gameMode);
+            game.setTotalLegs(numLegs);
 
             game.setStatus(GameStatus.ONGOING);
 
@@ -185,6 +186,15 @@ public class GameController {
             return ResponseEntity.status(400).body(null);
         }
     }
+    @GetMapping
+    public ResponseEntity<List<Game>> getUserCompletedGames(User user) {
+        try {
+            List<Game> games = gameService.getUserCompletedGames(user.getId());
+            return ResponseEntity.ok(games);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(null);
+        }
+    }
 
     // Submit a Player’s Throw in a Multiplayer Game
     @PostMapping("/{gameId}/throws")
@@ -196,7 +206,6 @@ public class GameController {
             Game game = gameService.getGameSetup(gameId);
             Player currentPlayer = game.getCurrentPlayer();
 
-            // Check if it's the current user's turn
             if (!currentPlayer.getId().equals(currentUser.getId())) {
                 return ResponseEntity.status(403).body("It's not your turn.");
             }
