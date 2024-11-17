@@ -99,4 +99,14 @@ public class PlayerController {
         }
     }
 
+    @GetMapping("/users/{userId}/games")
+    public ResponseEntity<List<Game>> getUserCompletedGames(User user) {
+        try {
+            List<Game> games = userService.getUserCompletedGames(user.getId());
+            return ResponseEntity.ok(games);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(null);
+        }
+    }
+
 }

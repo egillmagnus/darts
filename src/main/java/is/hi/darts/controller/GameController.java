@@ -186,15 +186,6 @@ public class GameController {
             return ResponseEntity.status(400).body(null);
         }
     }
-    @GetMapping
-    public ResponseEntity<List<Game>> getUserCompletedGames(User user) {
-        try {
-            List<Game> games = gameService.getUserCompletedGames(user.getId());
-            return ResponseEntity.ok(games);
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body(null);
-        }
-    }
 
     // Submit a Player’s Throw in a Multiplayer Game
     @PostMapping("/{gameId}/throws")

@@ -1,9 +1,6 @@
 package is.hi.darts.service.implementation;
 
-import is.hi.darts.model.FriendRequest;
-import is.hi.darts.model.Friendship;
-import is.hi.darts.model.Game;
-import is.hi.darts.model.User;
+import is.hi.darts.model.*;
 import is.hi.darts.repository.FriendRequestRepository;
 import is.hi.darts.repository.FriendshipRepository;
 import is.hi.darts.repository.GameRepository;
@@ -76,6 +73,7 @@ public class UserServiceImplementation implements UserService {
     }
 
     // calculates the all-time three dart average for a player
+    @Override
     public double calculateThreeDartAverage(User user) {
         List<Game> userGames = gameRepository.findByPlayersId(user.getId());
 
@@ -84,11 +82,16 @@ public class UserServiceImplementation implements UserService {
                 .sum();
 
         int totalDartsThrown = userGames.stream()
-                .mapToInt(game -> game.getRounds().size() * 3) // Assuming each round has 3 darts
+                .mapToInt(game -> game.getRounds().size() * 3)
                 .sum();
 
         return totalDartsThrown == 0 ? 0 : totalScore / totalDartsThrown;
     }
+
+    public List<Game> getUserCompletedGames(Long userId) {
+        return gameRepository.findByStatusAndPlayersId(GameStatus.COMPLETED, userId);
+    }
+
 
 
 

@@ -233,10 +233,6 @@ public class GameServiceImplementation implements GameService {
         return gameRepository.findById(gameId).orElse(null);
     }
 
-    public List<Game> getUserCompletedGames(Long userId) {
-        return gameRepository.findByStatusAndPlayersId(GameStatus.COMPLETED, userId);
-    }
-
     @Override
     public List<User> getGameParticipants(Long gameId) {
         Game game = gameRepository.findById(gameId)

@@ -66,6 +66,5 @@ public interface GameService {
 
     List<Game> getOngoingGames(Long userId);
     List<Game> getSetupGames(Long userId);
-    List<Game> getUserCompletedGames(Long userId);
 }
 

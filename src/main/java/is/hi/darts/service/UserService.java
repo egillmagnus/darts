@@ -1,6 +1,7 @@
 package is.hi.darts.service;
 
 import is.hi.darts.model.FriendRequest;
+import is.hi.darts.model.Game;
 import is.hi.darts.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,4 +26,6 @@ public interface UserService extends UserDetailsService {
     List<FriendRequest> getIncomingRequests(Long userId);  // Get incoming friend requests
     List<FriendRequest> getOutgoingRequests(Long userId);
     double calculateThreeDartAverage(User user);
+
+    public List<Game> getUserCompletedGames(Long userId);
 }
