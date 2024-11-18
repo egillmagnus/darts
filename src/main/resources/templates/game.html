@@ -21,7 +21,7 @@
 <div class="player-box green">
     <div class="user-info">
         <strong><span th:text="${userNames[0]}"></span></strong>
-        <strong>Legs Won:</strong> <span th:attr="id='legs-won-' + ${players[0].id}"  th:text="${legsWon[0]}"></span>
+        <strong> Legs Won:</strong> <span th:attr="id='legs-won-' + ${players[0].id}"  th:text="${legsWon[0]}"></span>
     </div>
 
     <div class="score"><strong>Current Score: </strong> <span th:attr="id='player-score-' + ${players[0].id}" th:text="${players[0].score}"></span></div>
@@ -50,7 +50,7 @@
 <div class="player-box red">
     <div class="user-info">
         <strong><span th:text="${userNames[1]}"></span></strong>
-        <strong>Legs Won:</strong> <span th:attr="id='legs-won-' + ${players[1].id}" th:text="${legsWon[1]}"></span>
+        <strong> Legs Won:</strong> <span th:attr="id='legs-won-' + ${players[1].id}" th:text="${legsWon[1]}"></span>
     </div>
     <div class="score"><strong>Current Score: </strong> <span th:attr="id='player-score-' + ${players[1].id}" th:text="${players[1].score}"></span></div>
     <div class="left">

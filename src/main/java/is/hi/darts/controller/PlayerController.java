@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/player")
@@ -108,5 +109,13 @@ public class PlayerController {
             return ResponseEntity.status(400).body(null);
         }
     }
+
+    @GetMapping("/leaderboard")
+    public String getLeaderboard(Model model) {
+        List<Map<String, Object>> leaderboardStats = userService.getLeaderboardStats();
+        model.addAttribute("leaderboardStats", leaderboardStats);
+        return "leaderboard";
+    }
+
 
 }

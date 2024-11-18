@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserService extends UserDetailsService {
     User registerUser(String email, String displayName, String password);
@@ -28,4 +29,9 @@ public interface UserService extends UserDetailsService {
     double calculateThreeDartAverage(User user);
 
     public List<Game> getUserCompletedGames(Long userId);
+
+    public double calculateWinPercentage(User user);
+    public double calculateFirst9Average(User user);
+
+    List<Map<String, Object>> getLeaderboardStats();
 }
