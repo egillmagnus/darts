@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Leaderboard</title>
+    <!-- Include your main CSS file -->
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <!-- Include jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="leaderboard-container">
+    <!-- Green header for the leaderboard -->
+    <div class="leaderboard-header">
+        <h1 class="leaderboard-text">Leaderboards</h1>
+    </div>
+
+    <!-- Filter section -->
+    <div class="filter">
+        <label for="stat-select">Select Statistic:</label>
+        <select id="stat-select">
+            <option value="three-dart-average">3 Dart Average</option>
+            <option value="first9-average">First 9 Average</option>
+            <option value="win-percentage">Win Percentage</option>
+        </select>
+    </div>
+
+    <!-- Leaderboard table -->
+    <table>
+        <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody id="leaderboard-body">
+        <!-- Iterate over the leaderboardStats passed from the backend -->
+        <tr th:each="stat : ${leaderboardStats}">
+            <td>1</td> <!-- We'll update the rank dynamically -->
+            <td th:text="${stat['name']}">Player Name</td>
+            <td th:attr="data-three-dart-average=${stat['threeDartAverage']},
+                         data-first9-average=${stat['first9Average']},
+                         data-win-percentage=${stat['winPercentage']}"
+                th:text="${stat['threeDartAverage']}">Value</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- JavaScript code to handle dropdown change and update table -->
+<script>
+    $(document).ready(function () {
+        const tableBody = $('#leaderboard-body');
+
+        $('#stat-select').change(function () {
+            const selectedStat = $(this).val(); // e.g., 'three-dart-average'
+
+            // Collect all the rows into an array
+            const rows = tableBody.find('tr').get();
+
+            // Sort the rows based on the selected statistic
+            rows.sort(function (a, b) {
+                const aValue = parseFloat($(a).find('td:last').attr('data-' + selectedStat)) || 0;
+                const bValue = parseFloat($(b).find('td:last').attr('data-' + selectedStat)) || 0;
+
+                // Compare b and a to sort in decreasing order
+                return bValue - aValue;
+            });
+
+            // Update the rank numbers and display values
+            $.each(rows, function (index, row) {
+                const $row = $(row);
+                const statValue = parseFloat($row.find('td:last').attr('data-' + selectedStat)) || 0;
+
+                // Update the rank (first column)
+                $row.find('td:eq(0)').text(index + 1);
+
+                // Update the value in the last column
+                $row.find('td:last').text(
+                    !isNaN(statValue) ? statValue.toFixed(2) : 'Unknown'
+                );
+            });
+
+            // Append the sorted rows back to the table body
+            tableBody.empty().append(rows);
+        });
+
+        // Trigger change event on page load to initialize the table with the default statistic
+        $('#stat-select').trigger('change');
+    });
+</script>
+</body>
+</html>
