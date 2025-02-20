@@ -1,6 +1,8 @@
 package is.hi.darts.controller;
 
+import is.hi.darts.model.FriendRequest;
 import is.hi.darts.model.Game;
+import is.hi.darts.model.MessageResponse;
 import is.hi.darts.model.User;
 import is.hi.darts.service.GameService;
 import is.hi.darts.service.UserService;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,10 +29,9 @@ public class PlayerController {
 
     // Add a Friend
     @PostMapping("/friends/add")
-    public ResponseEntity<String> addFriend(@RequestParam String identifier) {
+    public ResponseEntity<MessageResponse> addFriend(@RequestParam String identifier) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = userService.getByEmail(userDetails.getUsername());
-
         try {
             User friend;
             if (identifier.matches("\\d+")) {
@@ -37,12 +39,20 @@ public class PlayerController {
             } else {
                 friend = userService.getByEmail(identifier);
             }
-
             userService.addFriend(currentUser.getId(), friend.getId());
-            return ResponseEntity.ok("Friend request sent.");
+            return ResponseEntity.ok(new MessageResponse("Friend request sent."));
         } catch (Exception e) {
-            return ResponseEntity.status(400).body("Failed to add friend: " + e.getMessage());
+            return ResponseEntity.status(400).body(new MessageResponse("Failed to add friend: " + e.getMessage()));
         }
+    }
+
+
+    @PostMapping("/friends/incoming")
+    public ResponseEntity<List<FriendRequest>> getIncomingFriendRequests() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.getByEmail(userDetails.getUsername());
+        List<FriendRequest> incomingRequests = userService.getIncomingRequests(user.getId());
+        return ResponseEntity.ok(incomingRequests);
     }
 
     // View Friends List
@@ -57,15 +67,25 @@ public class PlayerController {
     }
 
     // Accept/Reject Friend Request
-    @PostMapping("/friends/requests/respond")
-    public ResponseEntity<String> respondToFriendRequest(@RequestParam Long requestId, @RequestParam boolean response) {
+    @PostMapping("/friends/requests/accept")
+    public ResponseEntity<MessageResponse> acceptFriendRequest(@RequestParam Long requestId) {
         try {
-            userService.respondToFriendRequest(requestId, response);
-            return ResponseEntity.ok("Friend request " + (response ? "accepted" : "rejected"));
+            userService.respondToFriendRequest(requestId, true);
+            return ResponseEntity.ok(new MessageResponse("Friend request accepted"));
         } catch (Exception e) {
-            return ResponseEntity.status(400).body("Failed to respond to friend request: " + e.getMessage());
+            return ResponseEntity.status(400).body(new MessageResponse("Failed to accept friend request: " + e.getMessage()));
         }
     }
+    @PostMapping("/friends/requests/decline")
+    public ResponseEntity<MessageResponse> declineFriendRequest(@RequestParam Long requestId) {
+        try {
+            userService.respondToFriendRequest(requestId, false);
+            return ResponseEntity.ok(new MessageResponse("Friend request declined"));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(new MessageResponse("Failed to decline friend request: " + e.getMessage()));
+        }
+    }
+
 
     // Remove a Friend
     @DeleteMapping("/friends/{friendId}/remove")
