@@ -1,15 +1,13 @@
 package is.hi.darts.controller;
 
-import is.hi.darts.model.Game;
-import is.hi.darts.model.GameStatus;
-import is.hi.darts.model.Player;
-import is.hi.darts.model.User;
+import is.hi.darts.model.*;
 import is.hi.darts.repository.GameInviteRepository;
 import is.hi.darts.service.GameService;
 import is.hi.darts.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -57,58 +55,101 @@ public class GameController {
 
     // Create a New Game
     @PostMapping("/")
-    public ResponseEntity<Void> createNewGame() {
+    public ResponseEntity<Game> createNewGame() {
         try {
             System.out.println("Creating a game");
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             User currentUser = userService.getByEmail(userDetails.getUsername());
 
             Long gameId = gameService.createNewGame(currentUser);
-
-            return ResponseEntity.status(302).header("Location", "/games/" + gameId + "/setup").build();
+            Game game = gameService.getGameSetup(gameId);
+            return ResponseEntity.ok(game);
         } catch (Exception e) {
-            return ResponseEntity.status(400).build();
+            return ResponseEntity.status(400).body(null);
         }
     }
 
     // Invite Friends to a Game
     @PostMapping("/{gameId}/invite")
-    public ResponseEntity<String> inviteFriend(@PathVariable Long gameId, @RequestBody Long friendId) {
+    public ResponseEntity<MessageResponse> inviteFriend(@PathVariable Long gameId, @RequestBody Long friendId) {
         try {
             System.out.println(friendId);
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             User user = userService.getByEmail(userDetails.getUsername());
             Long userId = user.getId();
             gameService.inviteFriendToGame(gameId, friendId, userId);
-            return ResponseEntity.ok("Friend invited to the game.");
+            User friend = userService.getById(friendId);
+            return ResponseEntity.ok(new MessageResponse(friend.getDisplayName() + " invited to game"));
         } catch (Exception e) {
-            return ResponseEntity.status(400).body("Failed to invite friend: " + e.getMessage());
+            return ResponseEntity.status(400).body(new MessageResponse("Failed to invite friend: " + e.getMessage()));
         }
     }
 
-    @PostMapping("/invitations/decline")
-    public ResponseEntity<String> declineInvitation(@RequestBody Long invitationId) {
+    @PostMapping("/invites/decline")
+    public ResponseEntity<MessageResponse> declineGameInvite(@RequestParam Long inviteId) {
         try {
-            gameService.declineInvitation(invitationId);
-            return ResponseEntity.ok("Invitation declined.");
+            gameService.declineInvitation(inviteId);
+            return ResponseEntity.ok(new MessageResponse("Game invite declined"));
         } catch (Exception e) {
-            return ResponseEntity.status(400).body("Failed to decline invitation: " + e.getMessage());
+            return ResponseEntity.status(400)
+                    .body(new MessageResponse("Failed to decline game invite: " + e.getMessage()));
         }
     }
 
-    // Join a Multiplayer Game
-    @PostMapping("/{inviteId}/accept")
-    public ResponseEntity<String> joinMultiplayerGame(@PathVariable Long inviteId) {
+    @PostMapping("/invites/accept")
+    public ResponseEntity<?> acceptGameInvite(@RequestParam Long inviteId) {
         try {
+            // Accept the invite and retrieve the associated Game object.
+
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             User user = userService.getByEmail(userDetails.getUsername());
             Long userId = user.getId();
             Long gameId = gameService.acceptInvitation(inviteId, userId);
-            return ResponseEntity.status(302).header("Location", "/games/" + gameId).build();
+            Game game = gameService.getGameSetup(gameId);
+            return ResponseEntity.ok(game);
         } catch (Exception e) {
-            return ResponseEntity.status(400).body("Failed to join the game: " + e.getMessage());
+            return ResponseEntity.status(400)
+                    .body(new MessageResponse("Failed to accept game invite: " + e.getMessage()));
         }
     }
+
+    @PostMapping("/invites")
+    public ResponseEntity<List<GameInvite>> getGameInvites() {
+        try {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User currentUser = userService.getByEmail(userDetails.getUsername());
+            List<GameInvite> invites = gameService.getInvitationsForUser(currentUser.getId());
+            return ResponseEntity.ok(invites);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(null);
+        }
+    }
+
+    // Get ongoing games for the current user
+    @PostMapping("/ongoing")
+    public ResponseEntity<List<Game>> getOngoingGames() {
+        try {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User currentUser = userService.getByEmail(userDetails.getUsername());
+            List<Game> ongoingGames = gameService.getOngoingGames(currentUser.getId());
+            return ResponseEntity.ok(ongoingGames);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(null);
+        }
+    }
+
+    @PostMapping("/setup")
+    public ResponseEntity<List<Game>> getSetupGames() {
+        try {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User currentUser = userService.getByEmail(userDetails.getUsername());
+            List<Game> setupGames = gameService.getSetupGames(currentUser.getId());
+            return ResponseEntity.ok(setupGames);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(null);
+        }
+    }
+
 
     @PostMapping("/{gameId}/start")
     public ResponseEntity<String> startGame(@PathVariable Long gameId, @RequestBody Map<String, Object> gameSettings) {
@@ -128,6 +169,16 @@ public class GameController {
             return ResponseEntity.ok("Game started successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(400).body("Failed to start the game: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/get")
+    public ResponseEntity<Game> getGameById(@RequestParam("gameId") Long gameId) {
+        try {
+            Game game = gameService.getGameSetup(gameId);
+            return ResponseEntity.ok(game);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(null);
         }
     }
 

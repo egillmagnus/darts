@@ -240,12 +240,17 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public void removeFriend(Long userId, Long friendId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        User friend = userRepository.findById(friendId).orElseThrow(() -> new RuntimeException("Friend not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        User friend = userRepository.findById(friendId)
+                .orElseThrow(() -> new RuntimeException("Friend not found"));
 
-        Friendship friendship = friendshipRepository.findByUsers(user, friend)
-                .orElseThrow(() -> new RuntimeException("Friendship not found"));
-        friendshipRepository.delete(friendship);
+        List<Friendship> friendships = friendshipRepository.findByUsers(user, friend);
+        if (friendships.isEmpty()) {
+            throw new RuntimeException("Friendship not found");
+        }
+        // Delete all matching friendships
+        friendshipRepository.deleteAll(friendships);
     }
 
     @Override
