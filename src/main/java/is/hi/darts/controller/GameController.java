@@ -85,6 +85,41 @@ public class GameController {
         }
     }
 
+    @PutMapping("/{gameId}/gameType")
+    public ResponseEntity<Game> updateGameType(@PathVariable Long gameId,
+                                               @RequestBody Long type) {
+        try {
+            Game updatedGame = gameService.getGameSetup(gameId);
+
+            updatedGame.setGameType(type.toString());
+
+            gameService.updateGameSetup(gameId, updatedGame);
+            System.out.println("Saved game: "+updatedGame.getId().toString() + " " + updatedGame.getGameType());
+
+            updatedGame = gameService.getGameSetup(gameId);
+
+            System.out.println("Retrieved after save: " + updatedGame.getId().toString() + " " + updatedGame.getGameType());
+            return ResponseEntity.ok(updatedGame);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @PutMapping("/{gameId}/totalLegs")
+    public ResponseEntity<Game> updateTotalLegs(@PathVariable Long gameId,
+                                                @RequestBody Long legs) {
+        try {
+            Game updatedGame = gameService.getGameSetup(gameId);
+
+            updatedGame.setTotalLegs(legs);
+
+            gameService.updateGameSetup(gameId, updatedGame);
+            return ResponseEntity.ok(updatedGame);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
     @PostMapping("/invites/decline")
     public ResponseEntity<MessageResponse> declineGameInvite(@RequestParam Long inviteId) {
         try {
