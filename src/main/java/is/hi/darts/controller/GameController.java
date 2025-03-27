@@ -93,7 +93,11 @@ public class GameController {
 
             updatedGame.setGameType(type.toString());
 
-            gameService.updateGameSetup(gameId, updatedGame);
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = userService.getByEmail(userDetails.getUsername());
+            Long userId = user.getId();
+
+            gameService.updateGameSetup(gameId, updatedGame, userId);
             System.out.println("Saved game: "+updatedGame.getId().toString() + " " + updatedGame.getGameType());
 
             updatedGame = gameService.getGameSetup(gameId);
@@ -112,8 +116,11 @@ public class GameController {
             Game updatedGame = gameService.getGameSetup(gameId);
 
             updatedGame.setTotalLegs(legs);
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = userService.getByEmail(userDetails.getUsername());
+            Long userId = user.getId();
 
-            gameService.updateGameSetup(gameId, updatedGame);
+            gameService.updateGameSetup(gameId, updatedGame, userId);
             return ResponseEntity.ok(updatedGame);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -193,7 +200,7 @@ public class GameController {
             Game game = gameService.getGameSetup(gameId);
             game.setStatus(GameStatus.ONGOING);
 
-            gameService.updateGameSetup(gameId, game);
+            gameService.updateGameSetup(gameId, game, -1L);
 
             return ResponseEntity.ok(new MessageResponse("Game started successfully."));
         } catch (Exception e) {
@@ -237,7 +244,10 @@ public class GameController {
     @PutMapping("/{gameId}/setup")
     public ResponseEntity<Game> updateGameSetup(@PathVariable Long gameId, @RequestBody Game updatedGame) {
         try {
-            Game game = gameService.updateGameSetup(gameId, updatedGame);
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = userService.getByEmail(userDetails.getUsername());
+            Long userId = user.getId();
+            Game game = gameService.updateGameSetup(gameId, updatedGame, userId);
             return ResponseEntity.ok(game);
         } catch (Exception e) {
             return ResponseEntity.status(400).body(null);

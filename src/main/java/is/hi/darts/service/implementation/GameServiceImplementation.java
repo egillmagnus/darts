@@ -107,7 +107,10 @@ public class GameServiceImplementation implements GameService {
         gameRepository.save(game);
 
         gameInviteRepository.delete(invite);
-        sendGameUpdateWebsocketMessage();
+        Long id1 = game.getPlayers().get(0).getId();
+        Long id2 = game.getPlayers().get(1).getId();
+
+        sendGameUpdateWebsocketMessage(id1, id2);
 
         return game.getId();
     }
@@ -142,7 +145,7 @@ public class GameServiceImplementation implements GameService {
     }
 
     @Override
-    public Game updateGameSetup(Long gameId, Game updatedGame) throws Exception {
+    public Game updateGameSetup(Long gameId, Game updatedGame, Long userId) throws Exception {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new Exception("Game not found"));
 
@@ -152,7 +155,10 @@ public class GameServiceImplementation implements GameService {
 
         game = gameRepository.save(game);
 
-        sendGameUpdateWebsocketMessage();
+        Long id1 = game.getPlayers().get(0).getId();
+        Long id2 = game.getPlayers().get(1).getId();
+
+        sendGameUpdateWebsocketMessage(id1, id2);
 
         return game;
     }
@@ -179,7 +185,10 @@ public class GameServiceImplementation implements GameService {
         game.submitThrow(score);
         gameRepository.save(game);
 
-        sendGameUpdateWebsocketMessage();
+        Long id1 = game.getPlayers().get(0).getId();
+        Long id2 = game.getPlayers().get(1).getId();
+
+        sendGameUpdateWebsocketMessage(id1, id2);
     }
 
     @Override
@@ -201,7 +210,10 @@ public class GameServiceImplementation implements GameService {
                 ))
                 .collect(Collectors.toList());
 
-        sendGameUpdateWebsocketMessage();
+        Long id1 = game.getPlayers().get(0).getId();
+        Long id2 = game.getPlayers().get(1).getId();
+
+        sendGameUpdateWebsocketMessage(id1, id2);
     }
 
     @Override
@@ -257,8 +269,12 @@ public class GameServiceImplementation implements GameService {
         return totalDartsThrown == 0 ? 0 : totalScore / (double) totalDartsThrown;
     }
 
-    private void sendGameUpdateWebsocketMessage() {
-        messagingTemplate.convertAndSend("/topic/game-updates", "GAME_UPDATED");
+    private void sendGameUpdateWebsocketMessage(Long userId1, Long userId2) {
+        System.out.println("Sending ws message to " + "/topic/game-updates/" + userId1);
+        messagingTemplate.convertAndSend("/topic/game-updates/" + userId1, "GAME_UPDATED");
+        System.out.println("Sending ws message to " + "/topic/game-updates/" + userId2);
+        messagingTemplate.convertAndSend("/topic/game-updates/" + userId2, "GAME_UPDATED");
+
     }
 
     public List<Game> getSetupGames(Long userId) {

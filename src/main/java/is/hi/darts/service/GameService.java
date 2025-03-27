@@ -36,11 +36,11 @@ public interface GameService {
     void resumeGame(Long gameId) throws Exception;
 
     // Update game setup before starting
-    Game updateGameSetup(Long gameId, Game updatedGame) throws Exception;
+    Game updateGameSetup(Long gameId, Game updatedGame, Long userId) throws Exception;
 
     Long createNewGame(User user) throws Exception;
 
-    // Retrieve all games with sorting
+    // Retrieve all games with sortingF
     List<Game> getAllGames(String sort);
 
 
