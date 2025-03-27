@@ -107,7 +107,7 @@ public class GameServiceImplementation implements GameService {
         gameRepository.save(game);
 
         gameInviteRepository.delete(invite);
-        messagingTemplate.convertAndSend("/topic/game-setup/" + game.getId(), game.getPlayers().get(1));
+        sendGameUpdateWebsocketMessage();
 
         return game.getId();
     }
@@ -150,11 +150,11 @@ public class GameServiceImplementation implements GameService {
         game.setRounds(updatedGame.getRounds());
         game.setGameType(updatedGame.getGameType());
 
-        if(game.getStatus() == GameStatus.ONGOING){
-            messagingTemplate.convertAndSend("/topic/game-setup/" + gameId, "GAME_STARTED");
-        }
+        game = gameRepository.save(game);
 
-        return gameRepository.save(game);
+        sendGameUpdateWebsocketMessage();
+
+        return game;
     }
 
     @Override
@@ -179,24 +179,9 @@ public class GameServiceImplementation implements GameService {
         game.submitThrow(score);
         gameRepository.save(game);
 
-        List<GameUpdateMessage.PlayerScore> playerScores = game.getPlayers().stream()
-                .map(player -> new GameUpdateMessage.PlayerScore(
-                        player.getId(),
-                        player.getScore(),
-                        game.getGameThreeDartAverage(player.getId()),
-                        game.getGameFirst9Average(player.getId()),
-                        (int) game.getLastScore(player.getId()),
-                        game.getDartsThrown(player.getId()),
-                        player.getLegsWon()
-                ))
-                .collect(Collectors.toList());
-
-        GameUpdateMessage message = new GameUpdateMessage(gameId, playerScores);
-        messagingTemplate.convertAndSend("/topic/game-updates", message);
-        if(game.getStatus() == GameStatus.COMPLETED){
-            messagingTemplate.convertAndSend("/topic/game/" + gameId + "/status", "GAME_COMPLETED");
-        }
+        sendGameUpdateWebsocketMessage();
     }
+
     @Override
     public void undoLastThrow(Long gameId) {
         Game game = gameRepository.findById(gameId)
@@ -216,8 +201,7 @@ public class GameServiceImplementation implements GameService {
                 ))
                 .collect(Collectors.toList());
 
-        GameUpdateMessage message = new GameUpdateMessage(gameId, playerScores);
-        messagingTemplate.convertAndSend("/topic/game-updates", message);
+        sendGameUpdateWebsocketMessage();
     }
 
     @Override
@@ -271,6 +255,10 @@ public class GameServiceImplementation implements GameService {
                 .sum();
 
         return totalDartsThrown == 0 ? 0 : totalScore / (double) totalDartsThrown;
+    }
+
+    private void sendGameUpdateWebsocketMessage() {
+        messagingTemplate.convertAndSend("/topic/game-updates", "GAME_UPDATED");
     }
 
     public List<Game> getSetupGames(Long userId) {

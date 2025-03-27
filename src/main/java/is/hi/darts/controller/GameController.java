@@ -269,7 +269,7 @@ public class GameController {
 
     // Submit a Player’s Throw in a Multiplayer Game
     @PostMapping("/{gameId}/throws")
-    public ResponseEntity<String> submitThrow(@PathVariable Long gameId, @RequestBody int score) {
+    public ResponseEntity<MessageResponse> submitThrow(@PathVariable Long gameId, @RequestBody int score) {
         try {
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             User currentUser = userService.getByEmail(userDetails.getUsername());
@@ -278,15 +278,12 @@ public class GameController {
             Player currentPlayer = game.getCurrentPlayer();
 
             if (!currentPlayer.getId().equals(currentUser.getId())) {
-                return ResponseEntity.status(403).body("It's not your turn.");
+                return ResponseEntity.status(403).body(new MessageResponse("It's not your turn."));
             }
             gameService.submitThrow(gameId, score);
-            //if(game.getStatus() == GameStatus.COMPLETED){
-                //
-            //}
-            return ResponseEntity.ok("Score submitted.");
+            return ResponseEntity.ok(new MessageResponse("Score submitted."));
         } catch (Exception e) {
-            return ResponseEntity.status(400).body("Failed to submit throw: " + e.getMessage());
+            return ResponseEntity.status(400).body(new MessageResponse("Failed to submit throw: " + e.getMessage()));
         }
     }
 
