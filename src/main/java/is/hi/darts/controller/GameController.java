@@ -187,23 +187,17 @@ public class GameController {
 
 
     @PostMapping("/{gameId}/start")
-    public ResponseEntity<String> startGame(@PathVariable Long gameId, @RequestBody Map<String, Object> gameSettings) {
+    public ResponseEntity<MessageResponse> startGame(@PathVariable Long gameId) {
         try {
-            String gameMode = (String) gameSettings.get("gameMode");
-            int numLegs = Integer.parseInt(gameSettings.get("numLegs").toString());
 
             Game game = gameService.getGameSetup(gameId);
-
-            game.setGameType(gameMode);
-            game.setTotalLegs(numLegs);
-
             game.setStatus(GameStatus.ONGOING);
 
             gameService.updateGameSetup(gameId, game);
 
-            return ResponseEntity.ok("Game started successfully.");
+            return ResponseEntity.ok(new MessageResponse("Game started successfully."));
         } catch (Exception e) {
-            return ResponseEntity.status(400).body("Failed to start the game: " + e.getMessage());
+            return ResponseEntity.status(400).body(new MessageResponse("Failed to start the game: " + e.getMessage()));
         }
     }
 
