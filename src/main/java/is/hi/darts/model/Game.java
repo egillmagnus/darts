@@ -229,6 +229,10 @@ public class Game {
         return totalRounds * 3; // Assuming each round involves 3 darts thrown
     }
 
+    public List<Leg> getLegs() {
+        return legs;
+    }
+
     // Logic to undo the last throw
 
     private void nextPlayer() {
