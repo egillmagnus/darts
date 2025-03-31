@@ -454,5 +454,33 @@ public class GameController {
     }
 
 
+    @PutMapping("/{gameId}/playerLocation")
+    public ResponseEntity<MessageResponse> updatePlayerLocation(@PathVariable Long gameId,
+                                                                @RequestParam Long playerId,
+                                                                @RequestParam double latitude,
+                                                                @RequestParam double longitude) {
+        try {
+            LatLon position = new LatLon(latitude, longitude);
+            gameService.setPlayerLocation(gameId, playerId, position);
+            return ResponseEntity.ok(new MessageResponse("Player location updated successfully."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new MessageResponse("Failed to update player location: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{gameId}/playerLocation")
+    public ResponseEntity<MessageResponse> getPlayerDistance(@PathVariable Long gameId ) {
+        try {
+            Game game = gameService.getGameSetup(gameId);
+            List<LatLon> locations = game.getPlayerLocations();
+            String distance = locations.get(0).distance(locations.get(1));
+            return ResponseEntity.ok(new MessageResponse(distance));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new MessageResponse("Unknown"));
+        }
+    }
+
 
 }

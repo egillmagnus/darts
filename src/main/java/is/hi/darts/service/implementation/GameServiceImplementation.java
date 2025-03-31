@@ -230,6 +230,17 @@ public class GameServiceImplementation implements GameService {
     }
 
     @Override
+    public void setPlayerLocation(Long gameId, Long playerId, LatLon position) {
+        Optional<Game> opGame = gameRepository.findById(gameId);
+        if(opGame.isPresent()) {
+            Game game = opGame.get();
+            game.setPlayerLocationForPlayer(playerId, position);
+            gameRepository.save(game);
+        }
+
+    }
+
+    @Override
     public List<User> getGameParticipants(Long gameId) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new RuntimeException("Game not found"));

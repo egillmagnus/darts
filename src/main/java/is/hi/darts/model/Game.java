@@ -49,7 +49,12 @@ public class Game {
     @Column(name = "total_legs")
     private Long totalLegs;
 
+    @ElementCollection
+    @CollectionTable(name = "player_locations", joinColumns = @JoinColumn(name = "game_id"))
+    private List<LatLon> playerLocations;
+
     public Game() {
+        this.playerLocations = new ArrayList<>();
     }
 
     public Game(User user) {
@@ -58,6 +63,8 @@ public class Game {
         this.players.add(new Player(user));
         this.rounds = new ArrayList<>();
         this.legs = new ArrayList<>();
+        this.playerLocations = new ArrayList<>();
+        this.playerLocations.add(null);
         Leg firstLeg = new Leg(0);
         legs.add(firstLeg);
         this.currentRound = 0;
@@ -87,6 +94,9 @@ public class Game {
 
     public void addPlayer(User user) {
         this.players.add(new Player(user));
+        if(this.playerLocations != null) {
+            this.playerLocations.add(null);
+        }
     }
 
     public LocalDateTime getDate() {
@@ -170,6 +180,33 @@ public class Game {
 
     public Long getCurrentLeg(){
         return longValue(legs.size());
+    }
+
+    public List<LatLon> getPlayerLocations() {
+        return playerLocations;
+    }
+
+    /**
+     * Sets the LatLon for the player with the given playerId.
+     * It finds the player in the players list and updates the corresponding index
+     * in the playerLocations list.
+     *
+     * @param playerId the id of the player
+     * @param latLon the LatLon object to set for the player
+     * @throws IllegalArgumentException if the playerId is not found
+     */
+    public void setPlayerLocationForPlayer(Long playerId, LatLon latLon) {
+        for (int i = 0; i < players.size(); i++) {
+            if (players.get(i).getId().equals(playerId)) {
+                // Ensure the playerLocations list is large enough.
+                while (playerLocations.size() <= i) {
+                    playerLocations.add(null);
+                }
+                playerLocations.set(i, latLon);
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Player with id " + playerId + " not found.");
     }
 
 

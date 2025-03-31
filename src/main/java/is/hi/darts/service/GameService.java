@@ -1,9 +1,6 @@
 package is.hi.darts.service;
 
-import is.hi.darts.model.Game;
-import is.hi.darts.model.GameInvite;
-import is.hi.darts.model.Player;
-import is.hi.darts.model.User;
+import is.hi.darts.model.*;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +15,8 @@ public interface GameService {
 
     // Accept an invitation to join a game
     Long acceptInvitation(Long inviteId, Long userId) throws Exception;
+
+    public void setPlayerLocation(Long gameId, Long playerId, LatLon position);
 
     public void deleteGame(Long gameId) throws Exception;
 
