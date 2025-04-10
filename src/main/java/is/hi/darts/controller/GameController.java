@@ -480,6 +480,5 @@ public class GameController {
             return ResponseEntity.ok(new MessageResponse("Unknown"));
         }
     }
-s
 
 }
