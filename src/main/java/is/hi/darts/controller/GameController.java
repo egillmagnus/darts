@@ -477,10 +477,9 @@ public class GameController {
             String distance = locations.get(0).distance(locations.get(1));
             return ResponseEntity.ok(new MessageResponse(distance));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new MessageResponse("Unknown"));
+            return ResponseEntity.ok(new MessageResponse("Unknown"));
         }
     }
-
+s
 
 }

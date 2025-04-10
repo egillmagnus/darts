@@ -25,6 +25,9 @@ public class LatLon {
         double deltaLat = Math.toRadians(other.lat - this.lat);
         double deltaLon = Math.toRadians(other.lon - this.lon);
 
+        System.out.println(this);
+        System.out.println(other);
+
         // Haversine formula
         double a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
                 Math.cos(lat1) * Math.cos(lat2) *
@@ -38,5 +41,10 @@ public class LatLon {
             int meters = (int) Math.round(distanceKm * 1000);
             return meters + "m";
         }
+    }
+
+    @Override
+    public String toString() {
+        return this.lat + ", " + this.lon;
     }
 }
