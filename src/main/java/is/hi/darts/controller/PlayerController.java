@@ -149,11 +149,17 @@ public class PlayerController {
         }
     }
 
+  //  @GetMapping("/leaderboard")
+  //  public String getLeaderboard(Model model) {
+  //      List<Map<String, Object>> leaderboardStats = userService.getLeaderboardStats();
+  //      model.addAttribute("leaderboardStats", leaderboardStats);
+  //      return "leaderboard";
+  //  }
+
     @GetMapping("/leaderboard")
-    public String getLeaderboard(Model model) {
-        List<Map<String, Object>> leaderboardStats = userService.getLeaderboardStats();
-        model.addAttribute("leaderboardStats", leaderboardStats);
-        return "leaderboard";
+    @ResponseBody
+    public List<Map<String, Object>> getLeaderboard() {
+        return userService.getLeaderboardStats();
     }
 
 
